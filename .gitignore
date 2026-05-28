@@ -1,49 +1,56 @@
-# Python
+# ── Environment & Secrets ─────────────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+
+# ── Python ────────────────────────────────────────────────────────────────────
 __pycache__/
 *.py[cod]
 *.pyo
 *.pyd
 *.so
 .Python
-venv/
-.env
-.venv/
-
-# FastAPI
-*.db
-
-# Logs
-logs/
-*.log
-
-# IDE
-.vscode/
-.idea/
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Pytest
-.pytest_cache/
-
-# Ruff
-.ruff_cache/
-
-# Coverage
-.coverage
-htmlcov/
-
-# Docker
-docker-data/
-
-# Build
+*.egg-info/
 dist/
 build/
 
-# Node
-node_modules/
+# ── Virtual Environments ──────────────────────────────────────────────────────
+venv/
+.venv/
+ENV/
 
-# Secrets
-.env.local
-.env.production
+# ── Testing & Coverage ────────────────────────────────────────────────────────
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+.tox/
+
+# ── Type Checking ─────────────────────────────────────────────────────────────
+.mypy_cache/
+
+# ── Ruff ──────────────────────────────────────────────────────────────────────
+.ruff_cache/
+
+# ── IDEs ──────────────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# ── Docker ────────────────────────────────────────────────────────────────────
+docker-compose.override.yml
+docker-data/
+
+# ── Data & Logs ───────────────────────────────────────────────────────────────
+data/
+uploads/
+screenshots/
+logs/
+*.log
+*.db
+
+# ── Node (future frontend) ────────────────────────────────────────────────────
+node_modules/

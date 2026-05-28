@@ -1,0 +1,2391 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oracle Trader Assist — HUD Visual Reference v4</title>
+<!-- ⚠️ REFERÊNCIA VISUAL APENAS — Design system e layout de referência.
+     Nome oficial: Oracle Trader Assist (oracle_*)
+     Esta referência serve apenas para direção de UX, layout e glassmorphism.
+     Não representa o frontend final nem a arquitetura do sistema. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════════════════
+   JARVIS DSS v4 — DESIGN SYSTEM
+   Apple × Bloomberg × Iron Man
+══════════════════════════════════════════════════ */
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+:root {
+  /* Backgrounds */
+  --bg:        #060810;
+  --bg-b:      #08090F;
+  --s1:        rgba(255,255,255,0.030);
+  --s2:        rgba(255,255,255,0.050);
+  --s3:        rgba(255,255,255,0.075);
+  --s4:        rgba(255,255,255,0.110);
+  --border:    rgba(255,255,255,0.080);
+  --border-hi: rgba(255,255,255,0.150);
+
+  /* Primary — Electric Teal */
+  --tl:        #00D4AA;
+  --tl-lo:     rgba(0,212,170,0.10);
+  --tl-mid:    rgba(0,212,170,0.20);
+  --tl-glow:   rgba(0,212,170,0.40);
+
+  /* Secondary — Amber Gold */
+  --am:        #F5A30A;
+  --am-lo:     rgba(245,163,10,0.10);
+  --am-mid:    rgba(245,163,10,0.20);
+
+  /* Status */
+  --green:     #00C896;
+  --green-lo:  rgba(0,200,150,0.12);
+  --red:       #FF4560;
+  --red-lo:    rgba(255,69,96,0.12);
+  --blue:      #4D9EFF;
+  --blue-lo:   rgba(77,158,255,0.12);
+
+  /* Text */
+  --t1:   #E4EDF8;
+  --t2:   #8BA5BE;
+  --t3:   #4D6A80;
+  --t4:   #2A3D50;
+
+  /* Fonts */
+  --sans: 'Outfit', sans-serif;
+  --mono: 'JetBrains Mono', monospace;
+
+  /* Layout */
+  --sb-w: 220px;
+  --top-h: 52px;
+  --tick-h: 30px;
+}
+
+html, body { height:100%; overflow:hidden; }
+
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--t1);
+  display: flex;
+  position: relative;
+}
+
+/* ── AMBIENT BACKGROUND ─────────────────────── */
+body::before {
+  content:'';
+  position:fixed; inset:0;
+  background:
+    radial-gradient(ellipse 55% 45% at 15% 20%, rgba(0,212,170,0.09) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 55% at 85% 75%, rgba(77,158,255,0.07) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 60% 5%,  rgba(245,163,10,0.05) 0%, transparent 55%);
+  pointer-events:none; z-index:0;
+}
+
+/* Dot grid overlay */
+body::after {
+  content:'';
+  position:fixed; inset:0;
+  background-image: radial-gradient(rgba(255,255,255,0.04) 1px, transparent 1px);
+  background-size: 28px 28px;
+  pointer-events:none; z-index:0;
+}
+
+/* ══════════════════════════════════════════════
+   LAYOUT SHELL
+══════════════════════════════════════════════ */
+.shell {
+  display:flex; width:100%; height:100%; position:relative; z-index:1;
+}
+
+/* ══════════════════════════════════════════════
+   SIDEBAR
+══════════════════════════════════════════════ */
+.sidebar {
+  width: var(--sb-w);
+  height: 100%;
+  background: rgba(6,8,16,0.85);
+  backdrop-filter: blur(24px);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.sidebar::after {
+  content:'';
+  position:absolute; top:0; right:0;
+  width:1px; height:100%;
+  background: linear-gradient(to bottom, transparent 0%, var(--tl) 30%, var(--tl) 70%, transparent 100%);
+  opacity:0.25;
+}
+
+/* Logo */
+.logo {
+  padding: 20px 18px 16px;
+  border-bottom: 1px solid var(--border);
+  display:flex; align-items:center; gap:11px;
+}
+
+.logo-orb {
+  width:32px; height:32px;
+  background: conic-gradient(from 0deg, var(--tl), var(--am), var(--tl));
+  border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  position:relative;
+  animation: orb-spin 8s linear infinite;
+}
+
+.logo-orb::before {
+  content:'';
+  position:absolute; inset:3px;
+  background: var(--bg);
+  border-radius:50%;
+}
+
+.logo-orb::after {
+  content:'J';
+  font-family: var(--mono);
+  font-size:11px; font-weight:700;
+  color: var(--tl);
+  position:relative; z-index:1;
+}
+
+@keyframes orb-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.logo-text { line-height:1.2; }
+.logo-name { font-size:14px; font-weight:700; letter-spacing:.08em; color:var(--t1); }
+.logo-sub  { font-size:9.5px; letter-spacing:.12em; color:var(--t3); text-transform:uppercase; font-family:var(--mono); }
+
+/* Nav */
+.nav { padding:10px 0; flex:1; overflow-y:auto; }
+.nav::-webkit-scrollbar { width:2px; }
+.nav::-webkit-scrollbar-thumb { background:var(--border-hi); }
+
+.nav-sec {
+  font-size:9px; letter-spacing:.16em; color:var(--t4);
+  text-transform:uppercase; font-family:var(--mono);
+  padding: 12px 18px 5px;
+}
+
+.nav-item {
+  display:flex; align-items:center; gap:10px;
+  padding: 8px 18px;
+  cursor:pointer; border:none; background:none;
+  width:100%; text-align:left;
+  color:var(--t3); font-size:13px; font-family:var(--sans);
+  font-weight:400; transition: all .18s;
+  border-left: 2px solid transparent;
+  position:relative;
+}
+
+.nav-item:hover { color:var(--t1); background:var(--s2); }
+
+.nav-item.on {
+  color:var(--tl);
+  background: linear-gradient(90deg, var(--tl-lo), transparent);
+  border-left-color: var(--tl);
+  font-weight:500;
+}
+
+.nav-item .ni { font-size:12px; width:14px; text-align:center; }
+
+.nav-badge {
+  margin-left:auto;
+  font-family:var(--mono); font-size:9px;
+  background:var(--am-lo); color:var(--am);
+  border:1px solid var(--am-mid); border-radius:4px;
+  padding:1px 5px;
+}
+
+/* MT5 Widget */
+.mt5 {
+  margin:10px 10px 12px;
+  background:var(--s2); border:1px solid var(--border);
+  border-radius:10px; padding:10px 12px;
+}
+
+.mt5-head {
+  display:flex; align-items:center; gap:6px;
+  font-family:var(--mono); font-size:9px; color:var(--t3);
+  letter-spacing:.1em; text-transform:uppercase; margin-bottom:7px;
+}
+
+.live-dot {
+  width:6px; height:6px; border-radius:50%;
+  background:var(--green);
+  box-shadow: 0 0 6px var(--green);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+.mt5-sym { font-size:11px; font-weight:600; color:var(--t2); font-family:var(--mono); margin-bottom:2px; }
+.mt5-price {
+  font-family:var(--mono); font-size:20px; font-weight:700;
+  color:var(--t1); letter-spacing:-.01em; margin-bottom:3px;
+}
+
+.mt5-chg { font-family:var(--mono); font-size:10px; font-weight:500; margin-bottom:8px; }
+.pos { color:var(--green); } .neg { color:var(--red); }
+
+.mt5-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:5px; }
+.mt5-cell { text-align:center; }
+.mt5-lbl { font-size:8px; color:var(--t4); font-family:var(--mono); letter-spacing:.06em; text-transform:uppercase; }
+.mt5-val { font-size:11px; color:var(--t2); font-family:var(--mono); font-weight:500; }
+
+/* System status */
+.sys-status {
+  padding:8px 14px 10px;
+  border-top:1px solid var(--border);
+  display:flex; flex-direction:column; gap:4px;
+}
+
+.sys-row {
+  display:flex; align-items:center; justify-content:space-between;
+  font-size:10px; color:var(--t3); font-family:var(--mono);
+}
+
+.sys-dot { width:5px; height:5px; border-radius:50%; margin-right:5px; }
+.ok  { background:var(--green); box-shadow:0 0 4px var(--green); }
+.warn{ background:var(--am); }
+.err { background:var(--red); }
+
+/* ══════════════════════════════════════════════
+   MAIN
+══════════════════════════════════════════════ */
+.main { flex:1; display:flex; flex-direction:column; overflow:hidden; min-width:0; }
+
+/* Topbar */
+.topbar {
+  height:var(--top-h);
+  background:rgba(6,8,16,0.75); backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0 20px; flex-shrink:0;
+}
+
+.topbar-l { display:flex; align-items:center; gap:10px; }
+.page-title { font-size:14px; font-weight:600; color:var(--t1); }
+
+.badge {
+  font-family:var(--mono); font-size:9.5px; font-weight:500;
+  padding:3px 8px; border-radius:5px; letter-spacing:.04em;
+}
+
+.badge-tl { background:var(--tl-lo); color:var(--tl); border:1px solid rgba(0,212,170,.2); }
+.badge-am { background:var(--am-lo); color:var(--am); border:1px solid rgba(245,163,10,.2); }
+.badge-g  { background:var(--green-lo); color:var(--green); border:1px solid rgba(0,200,150,.2); }
+.badge-r  { background:var(--red-lo); color:var(--red); border:1px solid rgba(255,69,96,.2); }
+.badge-b  { background:var(--blue-lo); color:var(--blue); border:1px solid rgba(77,158,255,.2); }
+.badge-s  { background:var(--s3); color:var(--t2); border:1px solid var(--border); }
+
+.topbar-r { display:flex; align-items:center; gap:12px; }
+
+.clock {
+  font-family:var(--mono); font-size:12px; color:var(--t2); letter-spacing:.05em;
+}
+
+.topbar-btn {
+  width:28px; height:28px; border-radius:7px;
+  background:var(--s2); border:1px solid var(--border);
+  cursor:pointer; font-size:12px; color:var(--t2);
+  display:flex; align-items:center; justify-content:center;
+  transition:all .15s;
+}
+.topbar-btn:hover { background:var(--s3); color:var(--t1); }
+
+/* Ticker */
+.ticker-wrap {
+  height:var(--tick-h); background:rgba(0,0,0,0.4);
+  border-bottom:1px solid var(--border);
+  overflow:hidden; flex-shrink:0;
+  display:flex; align-items:center;
+}
+
+.ticker-inner {
+  display:flex; gap:0; white-space:nowrap;
+  animation: ticker-scroll 45s linear infinite;
+}
+
+@keyframes ticker-scroll {
+  from { transform:translateX(0); }
+  to   { transform:translateX(-50%); }
+}
+
+.tick-item {
+  display:inline-flex; align-items:center; gap:6px;
+  padding:0 20px; border-right:1px solid var(--border);
+  font-family:var(--mono); font-size:10px;
+}
+
+.tick-sym { color:var(--t2); font-weight:500; }
+.tick-p   { color:var(--t1); }
+.tick-chg { font-size:9px; }
+
+/* Content area */
+.content { flex:1; overflow:hidden; position:relative; }
+.page    { display:none; height:100%; overflow-y:auto; padding:20px; }
+.page.on { display:block; }
+.page::-webkit-scrollbar { width:4px; }
+.page::-webkit-scrollbar-thumb { background:var(--border-hi); border-radius:2px; }
+
+/* ══════════════════════════════════════════════
+   GRID / CARDS
+══════════════════════════════════════════════ */
+.g3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; }
+.g2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.gc { } /* full col */
+
+.card {
+  background:var(--s1); border:1px solid var(--border);
+  border-radius:12px; overflow:hidden;
+  position:relative; transition:border-color .2s;
+}
+
+.card:hover { border-color:var(--border-hi); }
+
+/* Corner bracket decoration */
+.card::before, .card::after {
+  content:''; position:absolute;
+  width:10px; height:10px; z-index:1;
+}
+.card::before {
+  top:6px; left:6px;
+  border-top:1px solid var(--tl-glow); border-left:1px solid var(--tl-glow);
+  opacity:0; transition:opacity .2s;
+}
+.card::after {
+  bottom:6px; right:6px;
+  border-bottom:1px solid var(--tl-glow); border-right:1px solid var(--tl-glow);
+  opacity:0; transition:opacity .2s;
+}
+.card:hover::before, .card:hover::after { opacity:1; }
+
+.card-head {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:11px 14px; border-bottom:1px solid var(--border);
+}
+
+.card-title { font-size:11px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:var(--t2); }
+.card-title.tl { color:var(--tl); }
+.card-title.am { color:var(--am); }
+.card-title.g  { color:var(--green); }
+.card-title.r  { color:var(--red); }
+
+.card-body { padding:14px; }
+.card-body.np { padding:0; }
+
+/* ══════════════════════════════════════════════
+   BUTTONS
+══════════════════════════════════════════════ */
+.btn {
+  padding:8px 16px; border-radius:8px; font-size:12px; font-weight:500;
+  cursor:pointer; border:none; transition:all .15s; font-family:var(--sans);
+  display:inline-flex; align-items:center; gap:6px;
+}
+
+.btn-tl {
+  background: linear-gradient(135deg, var(--tl), rgba(0,180,140,1));
+  color:#000; font-weight:600;
+  box-shadow: 0 0 20px rgba(0,212,170,0.25);
+}
+.btn-tl:hover { transform:translateY(-1px); box-shadow:0 4px 24px rgba(0,212,170,0.35); }
+
+.btn-am { background:var(--am-mid); color:var(--am); border:1px solid var(--am-mid); }
+.btn-am:hover { background:var(--am-lo); }
+
+.btn-ghost { background:var(--s3); color:var(--t2); border:1px solid var(--border); }
+.btn-ghost:hover { background:var(--s4); color:var(--t1); }
+
+.btn-danger { background:var(--red-lo); color:var(--red); border:1px solid rgba(255,69,96,.2); }
+
+/* ══════════════════════════════════════════════
+   ① ANÁLISE PAGE
+══════════════════════════════════════════════ */
+#pg-analysis .analysis-layout {
+  display:grid; grid-template-columns:1.6fr 1fr; gap:14px;
+}
+
+.chart-card { position:relative; }
+
+.chart-canvas {
+  width:100%; height:200px;
+  background: linear-gradient(180deg, var(--s1) 0%, rgba(0,212,170,0.02) 100%);
+  border-radius:8px; overflow:hidden; position:relative;
+  margin-bottom:10px;
+}
+
+.chart-overlay-label {
+  position:absolute; top:8px; left:10px;
+  font-family:var(--mono); font-size:9px; color:var(--t3); letter-spacing:.06em;
+}
+
+.chart-overlay-price {
+  position:absolute; top:8px; right:10px;
+  font-family:var(--mono); font-size:12px; font-weight:500; color:var(--tl);
+}
+
+.tf-tabs {
+  display:flex; gap:4px; margin-bottom:10px;
+}
+
+.tf-tab {
+  padding:4px 10px; border-radius:6px; font-size:10px;
+  font-family:var(--mono); font-weight:500; cursor:pointer;
+  background:var(--s2); border:1px solid var(--border); color:var(--t3);
+  transition:all .14s;
+}
+.tf-tab.on { background:var(--tl-lo); color:var(--tl); border-color:rgba(0,212,170,.3); }
+
+.chart-actions { display:flex; gap:8px; }
+
+/* Analysis result */
+.confidence-ring-wrap {
+  display:flex; flex-direction:column; align-items:center; padding:16px 0 10px;
+}
+
+.cring { position:relative; width:110px; height:110px; }
+
+.cring svg { transform:rotate(-90deg); }
+
+.cring-bg   { fill:none; stroke:var(--s4); stroke-width:8; }
+.cring-fill { fill:none; stroke-width:8; stroke-linecap:round; transition:stroke-dashoffset 1.4s cubic-bezier(.4,0,.2,1); }
+
+.cring-label {
+  position:absolute; inset:0;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+}
+
+.cring-num { font-family:var(--mono); font-size:24px; font-weight:700; color:var(--t1); line-height:1; }
+.cring-txt { font-size:9px; letter-spacing:.08em; text-transform:uppercase; color:var(--t3); margin-top:2px; }
+
+.suggestion-pill {
+  display:inline-block; padding:5px 16px; border-radius:20px;
+  font-size:12px; font-weight:600; letter-spacing:.04em;
+  margin:10px 0;
+}
+
+.pill-buy   { background:var(--green-lo); color:var(--green); border:1px solid rgba(0,200,150,.3); }
+.pill-sell  { background:var(--red-lo);   color:var(--red);   border:1px solid rgba(255,69,96,.3); }
+.pill-wait  { background:var(--am-lo);    color:var(--am);    border:1px solid rgba(245,163,10,.3); }
+.pill-avoid { background:var(--s3);       color:var(--t3);    border:1px solid var(--border); }
+
+.analysis-text {
+  font-size:12px; line-height:1.7; color:var(--t2); padding:12px 14px;
+  border-top:1px solid var(--border);
+}
+
+.analysis-text strong { color:var(--t1); font-weight:500; }
+.analysis-text .hl-tl { color:var(--tl); }
+.analysis-text .hl-am { color:var(--am); }
+.analysis-text .hl-r  { color:var(--red); }
+
+/* Setup box */
+.setup-grid {
+  display:grid; grid-template-columns:1fr 1fr; gap:8px;
+  padding:12px 14px;
+}
+
+.setup-item {}
+.setup-lbl { font-size:9px; text-transform:uppercase; letter-spacing:.1em; color:var(--t4); font-family:var(--mono); margin-bottom:2px; }
+.setup-val { font-family:var(--mono); font-size:14px; font-weight:600; color:var(--t1); }
+.setup-val.pos { color:var(--green); }
+.setup-val.neg { color:var(--red); }
+.setup-val.am  { color:var(--am); }
+
+/* Reasoning list */
+.reason-list { padding:0 14px 12px; }
+.reason-item {
+  display:flex; gap:8px; align-items:flex-start;
+  font-size:11px; color:var(--t2); padding:5px 0;
+  border-bottom:1px solid var(--s2);
+}
+.reason-item:last-child { border:none; }
+.ri-icon { font-size:10px; margin-top:1px; flex-shrink:0; }
+.ri-ok   { color:var(--green); }
+.ri-warn { color:var(--am); }
+.ri-bad  { color:var(--red); }
+
+/* Upload drop area */
+.drop-zone {
+  border:2px dashed var(--border-hi); border-radius:10px;
+  padding:24px; text-align:center; cursor:pointer;
+  transition:all .2s; margin-bottom:10px;
+  background:var(--s1);
+}
+.drop-zone:hover { border-color:var(--tl); background:var(--tl-lo); }
+.drop-icon { font-size:24px; margin-bottom:6px; opacity:.5; }
+.drop-label { font-size:12px; color:var(--t3); }
+.drop-sub   { font-size:10px; color:var(--t4); margin-top:3px; }
+
+/* ══════════════════════════════════════════════
+   ② CHAT PAGE
+══════════════════════════════════════════════ */
+#pg-chat { display:flex; flex-direction:column; padding:0; }
+
+.chat-area {
+  flex:1; overflow-y:auto; padding:20px;
+  display:flex; flex-direction:column; gap:14px;
+}
+.chat-area::-webkit-scrollbar { width:3px; }
+.chat-area::-webkit-scrollbar-thumb { background:var(--border-hi); }
+
+.msg { max-width:78%; display:flex; flex-direction:column; gap:4px; }
+.msg-jarvis { align-self:flex-start; }
+.msg-user   { align-self:flex-end; align-items:flex-end; }
+
+.msg-name { font-size:9.5px; letter-spacing:.06em; color:var(--t4); font-family:var(--mono); text-transform:uppercase; }
+
+.msg-bubble {
+  padding:10px 14px; border-radius:12px;
+  font-size:12.5px; line-height:1.65; color:var(--t1);
+}
+.jarvis-bubble {
+  background:var(--s2); border:1px solid var(--border);
+  border-bottom-left-radius:3px;
+}
+.user-bubble {
+  background: linear-gradient(135deg, rgba(0,212,170,0.15), rgba(0,180,140,0.08));
+  border:1px solid rgba(0,212,170,0.2);
+  border-bottom-right-radius:3px;
+}
+
+.msg-meta { font-size:9px; color:var(--t4); font-family:var(--mono); }
+
+.chat-confidence {
+  display:inline-flex; align-items:center; gap:6px;
+  background:var(--s3); border:1px solid var(--border);
+  border-radius:6px; padding:4px 10px; margin-top:6px;
+  font-family:var(--mono); font-size:10px;
+}
+
+.typing-anim {
+  display:inline-flex; gap:4px; align-items:center; padding:4px 0;
+}
+.typing-dot {
+  width:5px; height:5px; border-radius:50%; background:var(--tl);
+  animation: typing 1.2s infinite;
+}
+.typing-dot:nth-child(2) { animation-delay:.2s; }
+.typing-dot:nth-child(3) { animation-delay:.4s; }
+@keyframes typing { 0%,100%{opacity:.2;transform:translateY(0)} 50%{opacity:1;transform:translateY(-3px)} }
+
+.quick-actions {
+  display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px;
+}
+.qa-btn {
+  background:var(--s2); border:1px solid var(--border);
+  border-radius:20px; padding:4px 12px; font-size:11px;
+  color:var(--t2); cursor:pointer; transition:all .15s;
+}
+.qa-btn:hover { background:var(--tl-lo); border-color:rgba(0,212,170,.3); color:var(--tl); }
+
+.chat-input-bar {
+  padding:12px 20px 16px;
+  border-top:1px solid var(--border);
+  background:rgba(6,8,16,0.8);
+  display:flex; gap:8px; align-items:flex-end;
+}
+
+.chat-input {
+  flex:1; background:var(--s2); border:1px solid var(--border);
+  border-radius:10px; padding:9px 14px;
+  color:var(--t1); font-size:13px; font-family:var(--sans);
+  resize:none; outline:none; min-height:40px; max-height:120px;
+  transition:border-color .15s;
+}
+.chat-input:focus { border-color:rgba(0,212,170,.4); }
+.chat-input::placeholder { color:var(--t4); }
+
+/* ══════════════════════════════════════════════
+   ③ TRADES PAGE
+══════════════════════════════════════════════ */
+.stats-bar {
+  display:grid; grid-template-columns:repeat(5,1fr); gap:10px; margin-bottom:14px;
+}
+
+.stat-card {
+  background:var(--s2); border:1px solid var(--border);
+  border-radius:10px; padding:12px 14px;
+  text-align:center;
+}
+.stat-lbl { font-size:9px; text-transform:uppercase; letter-spacing:.1em; color:var(--t4); font-family:var(--mono); margin-bottom:4px; }
+.stat-val { font-family:var(--mono); font-size:18px; font-weight:700; color:var(--t1); line-height:1; }
+.stat-sub { font-size:9px; color:var(--t3); margin-top:2px; font-family:var(--mono); }
+
+.filter-tabs { display:flex; gap:4px; margin-bottom:12px; }
+.ftab {
+  padding:5px 14px; border-radius:7px; font-size:11px; font-weight:500;
+  cursor:pointer; background:var(--s2); border:1px solid var(--border);
+  color:var(--t3); transition:all .14s;
+}
+.ftab.on { background:var(--tl-lo); color:var(--tl); border-color:rgba(0,212,170,.3); }
+
+.trade-table { width:100%; border-collapse:collapse; font-size:12px; }
+.trade-table th {
+  font-family:var(--mono); font-size:9px; letter-spacing:.1em; text-transform:uppercase;
+  color:var(--t4); font-weight:400; padding:8px 10px; text-align:left;
+  border-bottom:1px solid var(--border);
+}
+.trade-table td {
+  padding:9px 10px; border-bottom:1px solid var(--s2);
+  color:var(--t2); vertical-align:middle;
+}
+.trade-table tr:hover td { background:var(--s2); color:var(--t1); }
+.trade-table td.mono { font-family:var(--mono); font-size:11px; }
+.trade-table td.win  { color:var(--green); font-weight:600; }
+.trade-table td.loss { color:var(--red);   font-weight:600; }
+.trade-table td.be   { color:var(--am);    font-weight:600; }
+
+.setup-tag {
+  background:var(--s3); border:1px solid var(--border);
+  border-radius:4px; padding:2px 7px; font-size:9.5px;
+  font-family:var(--mono); color:var(--t3);
+}
+
+/* ══════════════════════════════════════════════
+   ④ MERCADO PAGE
+══════════════════════════════════════════════ */
+.mkt-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:14px; }
+
+.mkt-card {
+  background:var(--s2); border:1px solid var(--border);
+  border-radius:10px; padding:12px 14px; cursor:pointer;
+  transition:all .15s;
+}
+.mkt-card:hover { border-color:var(--border-hi); }
+.mkt-card.sel { border-color:var(--tl); background:var(--tl-lo); }
+
+.mkt-sym  { font-family:var(--mono); font-size:11px; font-weight:600; color:var(--t2); margin-bottom:2px; }
+.mkt-p    { font-family:var(--mono); font-size:18px; font-weight:700; color:var(--t1); margin-bottom:3px; }
+.mkt-chg  { font-family:var(--mono); font-size:10px; }
+
+.tf-align-grid {
+  display:grid; grid-template-columns:repeat(6,1fr); gap:6px;
+  padding:12px 14px;
+}
+
+.tfa {
+  background:var(--s2); border:1px solid var(--border);
+  border-radius:8px; padding:8px 6px; text-align:center;
+}
+.tfa-name { font-family:var(--mono); font-size:9px; color:var(--t4); letter-spacing:.05em; margin-bottom:5px; }
+.tfa-trend {
+  font-size:14px; font-weight:700; border-radius:5px;
+  padding:3px 8px; display:inline-block;
+  font-family:var(--mono); font-size:10px;
+}
+.tfa-up   { background:var(--green-lo); color:var(--green); }
+.tfa-down { background:var(--red-lo);   color:var(--red);   }
+.tfa-side { background:var(--am-lo);    color:var(--am);    }
+
+.session-bar {
+  display:flex; height:32px; border-radius:8px; overflow:hidden;
+  margin:12px 14px 8px;
+}
+.session-seg { display:flex; align-items:center; justify-content:center; font-size:9px; font-family:var(--mono); }
+.sess-sydney  { background:rgba(77,158,255,.12); color:var(--blue); flex:1.5; }
+.sess-tokyo   { background:rgba(245,163,10,.10); color:var(--am);   flex:1.5; }
+.sess-london  { background:rgba(0,212,170,.12);  color:var(--tl);   flex:2; }
+.sess-ny      { background:rgba(255,69,96,.10);  color:var(--red);  flex:2; }
+.sess-overlap { background:rgba(0,212,170,.22);  color:var(--tl);   flex:.8; }
+
+/* ══════════════════════════════════════════════
+   ⑤ PERFORMANCE PAGE
+══════════════════════════════════════════════ */
+.perf-top { display:grid; grid-template-columns:200px 1fr 1fr; gap:14px; margin-bottom:14px; }
+
+.wr-gauge { text-align:center; padding:14px; }
+.wr-gauge svg { display:block; margin:0 auto 8px; }
+
+.gauge-arc { fill:none; stroke-width:14; stroke-linecap:round; }
+.gauge-bg  { stroke:var(--s4); }
+.gauge-val { stroke:var(--green); stroke-dasharray:220; stroke-dashoffset:60; transition:stroke-dashoffset 1.5s ease; }
+
+.wr-num  { font-family:var(--mono); font-size:28px; font-weight:700; color:var(--green); }
+.wr-sub  { font-size:10px; color:var(--t3); letter-spacing:.06em; text-transform:uppercase; }
+
+.metric-rows { display:flex; flex-direction:column; gap:8px; padding:12px 14px; }
+.mrow {
+  display:flex; align-items:center; justify-content:space-between;
+  font-size:12px; padding:5px 0; border-bottom:1px solid var(--s2);
+}
+.mrow:last-child { border:none; }
+.mrow-lbl { color:var(--t3); }
+.mrow-val { font-family:var(--mono); font-weight:600; color:var(--t1); font-size:13px; }
+
+.pnl-bars { padding:12px 14px; }
+.pnl-bar-row { display:flex; align-items:center; gap:8px; margin-bottom:7px; }
+.pnl-day  { font-family:var(--mono); font-size:9px; color:var(--t4); width:28px; }
+.pnl-bar-track { flex:1; height:14px; background:var(--s2); border-radius:3px; overflow:hidden; }
+.pnl-bar-fill  { height:100%; border-radius:3px; transition:width 1s ease; }
+.pnl-bar-pos   { background:linear-gradient(90deg, var(--green-lo), var(--green)); }
+.pnl-bar-neg   { background:linear-gradient(90deg, var(--red), var(--red-lo)); }
+.pnl-val  { font-family:var(--mono); font-size:9px; color:var(--t2); width:55px; text-align:right; }
+
+/* ══════════════════════════════════════════════
+   ⑥ BRIEFING PAGE
+══════════════════════════════════════════════ */
+.briefing-text {
+  font-size:13px; line-height:1.8; color:var(--t2);
+  padding:16px 18px;
+}
+.briefing-text h3 { color:var(--tl); font-size:12px; letter-spacing:.06em; text-transform:uppercase; margin:12px 0 6px; font-family:var(--mono); }
+.briefing-text p  { margin-bottom:10px; }
+.briefing-text strong { color:var(--t1); font-weight:500; }
+
+.watchlist-item {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:10px 14px; border-bottom:1px solid var(--s2);
+}
+.watchlist-item:last-child { border:none; }
+.wi-left  { display:flex; flex-direction:column; gap:2px; }
+.wi-sym   { font-family:var(--mono); font-size:12px; font-weight:600; color:var(--t1); }
+.wi-setup { font-size:10px; color:var(--t3); }
+.wi-right { text-align:right; }
+.wi-tf    { font-family:var(--mono); font-size:10px; }
+
+/* ══════════════════════════════════════════════
+   ⑦ CHECKLIST PAGE
+══════════════════════════════════════════════ */
+.checklist-layout { display:grid; grid-template-columns:1fr 340px; gap:14px; }
+
+.check-group { margin-bottom:10px; }
+.check-group-title {
+  font-size:9px; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--t4); font-family:var(--mono); padding:8px 14px 5px;
+  border-top:1px solid var(--s2);
+}
+
+.check-item {
+  display:flex; align-items:flex-start; gap:10px;
+  padding:9px 14px; border-bottom:1px solid var(--s2);
+  cursor:pointer; transition:background .14s;
+  -webkit-user-select:none; user-select:none;
+}
+.check-item:hover { background:var(--s2); }
+
+.check-box {
+  width:16px; height:16px; border-radius:4px;
+  border:1.5px solid var(--border-hi); flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  transition:all .15s; margin-top:1px;
+}
+.check-item.checked .check-box {
+  background:var(--tl); border-color:var(--tl);
+}
+.check-item.checked .check-box::after { content:'✓'; font-size:10px; color:#000; font-weight:700; }
+.check-item.blocked .check-box { border-color:var(--red); background:var(--red-lo); }
+.check-item.blocked .check-box::after { content:'✗'; font-size:10px; color:var(--red); font-weight:700; }
+
+.check-text { font-size:12px; color:var(--t2); line-height:1.5; }
+.check-item.checked .check-text { color:var(--t3); text-decoration:line-through; }
+
+.check-score-bar {
+  height:4px; border-radius:2px; background:var(--s3);
+  margin:14px 14px 4px; overflow:hidden;
+}
+.check-score-fill { height:100%; border-radius:2px; transition:width .5s ease; }
+.score-low  { background:var(--red); }
+.score-mid  { background:var(--am); }
+.score-high { background:var(--green); }
+
+.score-label { font-family:var(--mono); font-size:11px; color:var(--t3); text-align:center; margin-bottom:8px; }
+
+/* Risk calculator */
+.risk-inputs { display:grid; grid-template-columns:1fr 1fr; gap:8px; padding:12px 14px; }
+
+.risk-field label { font-size:9px; text-transform:uppercase; letter-spacing:.1em; color:var(--t4); font-family:var(--mono); display:block; margin-bottom:4px; }
+.risk-field input {
+  width:100%; background:var(--s3); border:1px solid var(--border);
+  border-radius:7px; padding:7px 10px; color:var(--t1);
+  font-family:var(--mono); font-size:13px; outline:none;
+  transition:border-color .14s;
+}
+.risk-field input:focus { border-color:rgba(0,212,170,.4); }
+
+.risk-result { padding:10px 14px; border-top:1px solid var(--border); }
+.risk-row { display:flex; justify-content:space-between; align-items:center; padding:5px 0; }
+.risk-row-lbl { font-size:11px; color:var(--t3); }
+.risk-row-val { font-family:var(--mono); font-size:13px; font-weight:600; }
+
+/* Anti-FOMO */
+.fomo-item {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:9px 14px; border-bottom:1px solid var(--s2);
+  font-size:11px;
+}
+.fomo-label { color:var(--t2); }
+.fomo-status { font-family:var(--mono); font-size:10px; padding:2px 8px; border-radius:4px; font-weight:500; }
+.fs-ok   { background:var(--green-lo); color:var(--green); }
+.fs-warn { background:var(--am-lo); color:var(--am); }
+.fs-bad  { background:var(--red-lo); color:var(--red); }
+
+/* ══════════════════════════════════════════════
+   ⑧ CONFIG PAGE
+══════════════════════════════════════════════ */
+.config-section { margin-bottom:14px; }
+.config-title { font-size:10px; text-transform:uppercase; letter-spacing:.12em; color:var(--t4); font-family:var(--mono); padding:0 14px 8px; }
+
+.config-row {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:10px 14px; border-bottom:1px solid var(--s2);
+}
+.config-row:last-child { border:none; }
+.config-lbl { font-size:12px; color:var(--t2); }
+.config-sub { font-size:10px; color:var(--t4); margin-top:1px; }
+.config-val { font-family:var(--mono); font-size:11px; color:var(--t3); }
+.config-masked { letter-spacing:.1em; color:var(--t4); }
+
+.toggle {
+  width:34px; height:18px; background:var(--s4); border-radius:9px;
+  cursor:pointer; position:relative; transition:background .2s;
+}
+.toggle.on { background:var(--tl); }
+.toggle::after {
+  content:''; position:absolute; width:12px; height:12px; border-radius:50%;
+  background:#fff; top:3px; left:3px; transition:transform .2s;
+}
+.toggle.on::after { transform:translateX(16px); }
+
+.status-indicator {
+  display:flex; align-items:center; gap:5px;
+  font-family:var(--mono); font-size:10px;
+}
+
+/* ══════════════════════════════════════════════
+   SCAN LINE ANIMATION ON ACTIVE CARD
+══════════════════════════════════════════════ */
+@keyframes scan {
+  0%  { transform:translateY(-100%); opacity:0; }
+  10% { opacity:.4; }
+  90% { opacity:.4; }
+  100%{ transform:translateY(100vh); opacity:0; }
+}
+
+.scan-line {
+  position:absolute; top:0; left:0; right:0; height:1px;
+  background:linear-gradient(90deg, transparent, var(--tl), transparent);
+  animation:scan 3s linear infinite;
+  pointer-events:none;
+}
+
+/* ══════════════════════════════════════════════
+   SCROLLBAR GLOBAL
+══════════════════════════════════════════════ */
+::-webkit-scrollbar        { width:4px; height:4px; }
+::-webkit-scrollbar-track  { background:transparent; }
+::-webkit-scrollbar-thumb  { background:var(--border-hi); border-radius:2px; }
+
+/* ══════════════════════════════════════════════
+   DIVIDER + MISC
+══════════════════════════════════════════════ */
+.divider { border:none; border-top:1px solid var(--border); margin:10px 0; }
+.mono    { font-family:var(--mono); }
+.gap8    { display:flex; gap:8px; flex-wrap:wrap; }
+.mt8 { margin-top:8px; }
+.mb8 { margin-bottom:8px; }
+.row { display:flex; align-items:center; gap:8px; }
+
+/* Chart SVG */
+.svg-chart-wrap { width:100%; position:relative; }
+</style>
+</head>
+<body>
+
+<!-- AMBIENT ORBS -->
+<div style="position:fixed;top:-80px;left:-80px;width:350px;height:350px;border-radius:50%;background:radial-gradient(circle,rgba(0,212,170,0.12),transparent 70%);filter:blur(60px);pointer-events:none;z-index:0;animation:orb-drift 14s ease-in-out infinite alternate"></div>
+<div style="position:fixed;bottom:-60px;right:-60px;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(77,158,255,0.08),transparent 70%);filter:blur(70px);pointer-events:none;z-index:0;animation:orb-drift 18s ease-in-out infinite alternate-reverse"></div>
+<div style="position:fixed;top:40%;left:40%;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(245,163,10,0.05),transparent 70%);filter:blur(80px);pointer-events:none;z-index:0"></div>
+<style>@keyframes orb-drift{from{transform:translate(0,0)}to{transform:translate(30px,20px)}}</style>
+
+<!-- SHELL -->
+<div class="shell">
+
+  <!-- ╔══════════════════════════════╗
+       ║  SIDEBAR                    ║
+       ╚══════════════════════════════╝ -->
+  <aside class="sidebar">
+
+    <!-- Logo -->
+    <div class="logo">
+      <div class="logo-orb"></div>
+      <div class="logo-text">
+        <div class="logo-name">JARVIS</div>
+        <div class="logo-sub">Decision Support System</div>
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="nav">
+      <div class="nav-sec">Core</div>
+      <button class="nav-item on" onclick="nav('analysis',this)"><span class="ni">◈</span>Análise</button>
+      <button class="nav-item" onclick="nav('chat',this)"><span class="ni">⬡</span>Chat — JARVIS</button>
+
+      <div class="nav-sec">Operações</div>
+      <button class="nav-item" onclick="nav('trades',this)"><span class="ni">◉</span>Trades <span class="nav-badge">+3 hoje</span></button>
+      <button class="nav-item" onclick="nav('checklist',this)"><span class="ni">☑</span>Checklist</button>
+
+      <div class="nav-sec">Mercado</div>
+      <button class="nav-item" onclick="nav('market',this)"><span class="ni">⌖</span>Mercado ao vivo</button>
+      <button class="nav-item" onclick="nav('briefing',this)"><span class="ni">◐</span>Briefing Matinal <span class="nav-badge">novo</span></button>
+
+      <div class="nav-sec">Análise</div>
+      <button class="nav-item" onclick="nav('perf',this)"><span class="ni">▦</span>Performance</button>
+
+      <div class="nav-sec">Sistema</div>
+      <button class="nav-item" onclick="nav('config',this)"><span class="ni">⚙</span>Configurações</button>
+    </nav>
+
+    <!-- MT5 Live Widget -->
+    <div class="mt5">
+      <div class="mt5-head"><div class="live-dot"></div>MT5 LIVE</div>
+      <div class="mt5-sym" id="sb-sym">EUR/USD · M15</div>
+      <div class="mt5-price" id="sb-price">1.08461</div>
+      <div class="mt5-chg pos" id="sb-chg">▲ +0.0014 (+0.13%)</div>
+      <div class="mt5-grid">
+        <div class="mt5-cell">
+          <div class="mt5-lbl">BID</div>
+          <div class="mt5-val" id="sb-bid">1.08458</div>
+        </div>
+        <div class="mt5-cell">
+          <div class="mt5-lbl">ASK</div>
+          <div class="mt5-val" id="sb-ask">1.08464</div>
+        </div>
+        <div class="mt5-cell">
+          <div class="mt5-lbl">SPD</div>
+          <div class="mt5-val">0.6</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- System Status -->
+    <div class="sys-status">
+      <div class="sys-row"><span style="display:flex;align-items:center"><span class="sys-dot ok"></span>Claude API</span><span style="color:#00C896">online</span></div>
+      <div class="sys-row"><span style="display:flex;align-items:center"><span class="sys-dot ok"></span>MT5 Connect</span><span style="color:#00C896">ativo</span></div>
+      <div class="sys-row"><span style="display:flex;align-items:center"><span class="sys-dot warn"></span>Obsidian</span><span style="color:#F5A30A">sync</span></div>
+      <div class="sys-row"><span style="display:flex;align-items:center"><span class="sys-dot ok"></span>Scheduler</span><span style="color:#00C896">rodando</span></div>
+    </div>
+  </aside>
+
+  <!-- ╔══════════════════════════════╗
+       ║  MAIN                       ║
+       ╚══════════════════════════════╝ -->
+  <main class="main">
+
+    <!-- Topbar -->
+    <div class="topbar">
+      <div class="topbar-l">
+        <div class="page-title" id="page-title">Análise Técnica</div>
+        <span class="badge badge-tl" id="topbar-sym">EURUSD</span>
+        <span class="badge badge-am" id="topbar-tf">M15</span>
+        <span class="badge badge-s" id="topbar-extra">HTF: Bearish ↓</span>
+      </div>
+      <div class="topbar-r">
+        <span class="badge badge-g">● CLAUDE 3.7 ONLINE</span>
+        <div class="clock" id="clock">--:--:--</div>
+        <div class="topbar-btn" title="Notificações">🔔</div>
+        <div class="topbar-btn" title="Telegram">✈</div>
+        <div class="topbar-btn" title="TTS">🔊</div>
+      </div>
+    </div>
+
+    <!-- Market Ticker -->
+    <div class="ticker-wrap">
+      <div class="ticker-inner" id="ticker">
+        <!-- duplicated for seamless loop -->
+        <span class="tick-item"><span class="tick-sym">EURUSD</span><span class="tick-p">1.08461</span><span class="tick-chg pos">▲ +0.13%</span></span>
+        <span class="tick-item"><span class="tick-sym">GBPUSD</span><span class="tick-p">1.26832</span><span class="tick-chg neg">▼ -0.08%</span></span>
+        <span class="tick-item"><span class="tick-sym">XAUUSD</span><span class="tick-p">2318.40</span><span class="tick-chg pos">▲ +0.31%</span></span>
+        <span class="tick-item"><span class="tick-sym">US100</span><span class="tick-p">18,240.5</span><span class="tick-chg pos">▲ +0.54%</span></span>
+        <span class="tick-item"><span class="tick-sym">USDJPY</span><span class="tick-p">156.724</span><span class="tick-chg neg">▼ -0.22%</span></span>
+        <span class="tick-item"><span class="tick-sym">USDCAD</span><span class="tick-p">1.36841</span><span class="tick-chg neg">▼ -0.11%</span></span>
+        <span class="tick-item"><span class="tick-sym">WTI</span><span class="tick-p">78.32</span><span class="tick-chg pos">▲ +0.67%</span></span>
+        <span class="tick-item"><span class="tick-sym">AUDUSD</span><span class="tick-p">0.65104</span><span class="tick-chg pos">▲ +0.09%</span></span>
+        <span class="tick-item"><span class="tick-sym">EURJPY</span><span class="tick-p">169.842</span><span class="tick-chg neg">▼ -0.14%</span></span>
+        <!-- duplicate for infinite scroll -->
+        <span class="tick-item"><span class="tick-sym">EURUSD</span><span class="tick-p">1.08461</span><span class="tick-chg pos">▲ +0.13%</span></span>
+        <span class="tick-item"><span class="tick-sym">GBPUSD</span><span class="tick-p">1.26832</span><span class="tick-chg neg">▼ -0.08%</span></span>
+        <span class="tick-item"><span class="tick-sym">XAUUSD</span><span class="tick-p">2318.40</span><span class="tick-chg pos">▲ +0.31%</span></span>
+        <span class="tick-item"><span class="tick-sym">US100</span><span class="tick-p">18,240.5</span><span class="tick-chg pos">▲ +0.54%</span></span>
+        <span class="tick-item"><span class="tick-sym">USDJPY</span><span class="tick-p">156.724</span><span class="tick-chg neg">▼ -0.22%</span></span>
+        <span class="tick-item"><span class="tick-sym">USDCAD</span><span class="tick-p">1.36841</span><span class="tick-chg neg">▼ -0.11%</span></span>
+        <span class="tick-item"><span class="tick-sym">WTI</span><span class="tick-p">78.32</span><span class="tick-chg pos">▲ +0.67%</span></span>
+        <span class="tick-item"><span class="tick-sym">AUDUSD</span><span class="tick-p">0.65104</span><span class="tick-chg pos">▲ +0.09%</span></span>
+        <span class="tick-item"><span class="tick-sym">EURJPY</span><span class="tick-p">169.842</span><span class="tick-chg neg">▼ -0.14%</span></span>
+      </div>
+    </div>
+
+    <!-- Pages -->
+    <div class="content">
+
+      <!-- ══════════════════════════════════════
+           ① ANÁLISE
+      ══════════════════════════════════════ -->
+      <div id="pg-analysis" class="page on">
+        <div class="analysis-layout">
+
+          <!-- LEFT: Chart + Controls -->
+          <div>
+            <div class="card mb8">
+              <div class="scan-line"></div>
+              <div class="card-head">
+                <span class="card-title tl">Screenshot MT5 — EURUSD M15</span>
+                <span class="badge badge-s">Última análise: 14:32:08</span>
+              </div>
+              <div class="card-body">
+                <div class="tf-tabs">
+                  <div class="tf-tab">M1</div>
+                  <div class="tf-tab">M5</div>
+                  <div class="tf-tab on">M15</div>
+                  <div class="tf-tab">H1</div>
+                  <div class="tf-tab">H4</div>
+                  <div class="tf-tab">D1</div>
+                </div>
+
+                <!-- SVG Mock Chart -->
+                <div class="chart-canvas" style="height:210px;position:relative">
+                  <div class="chart-overlay-label">EURUSD · M15 · 90 barras</div>
+                  <div class="chart-overlay-price" id="chart-price">1.08461</div>
+                  <svg width="100%" height="100%" viewBox="0 0 700 180" preserveAspectRatio="none" style="position:absolute;inset:0">
+                    <!-- Grid lines -->
+                    <line x1="0" y1="45"  x2="700" y2="45"  stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+                    <line x1="0" y1="90"  x2="700" y2="90"  stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+                    <line x1="0" y1="135" x2="700" y2="135" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+                    <!-- EMA area fill -->
+                    <path d="M0,120 Q80,115 130,105 Q200,92 270,88 Q340,84 400,78 Q470,72 540,68 Q610,65 700,60 L700,180 L0,180Z" fill="rgba(0,212,170,0.05)"/>
+                    <!-- EMA line -->
+                    <path d="M0,120 Q80,115 130,105 Q200,92 270,88 Q340,84 400,78 Q470,72 540,68 Q610,65 700,60" fill="none" stroke="rgba(0,212,170,0.5)" stroke-width="1.5"/>
+                    <!-- Candles (simplified) -->
+                    <!-- bearish candles -->
+                    <g id="candles"></g>
+                    <!-- Resistance zone -->
+                    <rect x="0" y="52" width="700" height="8" fill="rgba(255,69,96,0.08)"/>
+                    <line x1="0" y1="52" x2="700" y2="52" stroke="rgba(255,69,96,0.4)" stroke-width="1" stroke-dasharray="6,4"/>
+                    <text x="8" y="49" fill="rgba(255,69,96,0.8)" font-size="8" font-family="JetBrains Mono,monospace">RESISTÊNCIA 1.0860</text>
+                    <!-- Support zone -->
+                    <rect x="0" y="138" width="700" height="8" fill="rgba(0,200,150,0.08)"/>
+                    <line x1="0" y1="146" x2="700" y2="146" stroke="rgba(0,200,150,0.4)" stroke-width="1" stroke-dasharray="6,4"/>
+                    <text x="8" y="158" fill="rgba(0,200,150,0.8)" font-size="8" font-family="JetBrains Mono,monospace">SUPORTE 1.0812</text>
+                    <!-- VWAP -->
+                    <path d="M0,100 Q150,98 300,90 Q450,82 700,70" fill="none" stroke="rgba(245,163,10,0.5)" stroke-width="1.2" stroke-dasharray="4,3"/>
+                    <text x="640" y="67" fill="rgba(245,163,10,0.8)" font-size="8" font-family="JetBrains Mono,monospace">VWAP</text>
+                    <!-- Current price line -->
+                    <line x1="0" y1="78" x2="700" y2="78" stroke="rgba(255,255,255,0.2)" stroke-width="0.5" stroke-dasharray="2,4"/>
+                  </svg>
+                </div>
+
+                <div class="chart-actions mt8">
+                  <button class="btn btn-tl" style="flex:1" onclick="simulateAnalysis()">▶ Analisar Screenshot</button>
+                  <button class="btn btn-ghost">📎 Upload</button>
+                  <button class="btn btn-ghost">📷 Câmera</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- OHLCV Context -->
+            <div class="card">
+              <div class="card-head">
+                <span class="card-title">Contexto OHLCV + MT5</span>
+                <span class="badge badge-s">via mt5_client.py</span>
+              </div>
+              <div class="card-body">
+                <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px">
+                  <div style="text-align:center">
+                    <div class="mt5-lbl">OPEN</div>
+                    <div style="font-family:var(--mono);font-size:12px;color:var(--t2)">1.08347</div>
+                  </div>
+                  <div style="text-align:center">
+                    <div class="mt5-lbl">HIGH</div>
+                    <div style="font-family:var(--mono);font-size:12px;color:var(--green)">1.08601</div>
+                  </div>
+                  <div style="text-align:center">
+                    <div class="mt5-lbl">LOW</div>
+                    <div style="font-family:var(--mono);font-size:12px;color:var(--red)">1.08301</div>
+                  </div>
+                  <div style="text-align:center">
+                    <div class="mt5-lbl">CLOSE</div>
+                    <div style="font-family:var(--mono);font-size:12px;color:var(--t1)">1.08461</div>
+                  </div>
+                  <div style="text-align:center">
+                    <div class="mt5-lbl">VOL</div>
+                    <div style="font-family:var(--mono);font-size:12px;color:var(--am)">12.4k</div>
+                  </div>
+                </div>
+                <div style="display:flex;gap:8px;margin-top:10px;font-size:10px;color:var(--t3);font-family:var(--mono)">
+                  <span>ATR(14): <strong style="color:var(--am)">0.0042</strong></span>
+                  <span style="border-left:1px solid var(--border);padding-left:8px">Posições abertas: <strong style="color:var(--tl)">0</strong></span>
+                  <span style="border-left:1px solid var(--border);padding-left:8px">Sessão: <strong style="color:var(--blue)">London/NY</strong></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- RIGHT: Analysis Result -->
+          <div style="display:flex;flex-direction:column;gap:14px">
+
+            <!-- Confidence Ring -->
+            <div class="card">
+              <div class="card-head">
+                <span class="card-title tl">Resultado JARVIS</span>
+                <span class="badge badge-s">claude-3-7-sonnet</span>
+              </div>
+              <div class="confidence-ring-wrap">
+                <div class="cring">
+                  <svg width="110" height="110" viewBox="0 0 110 110">
+                    <circle class="cring-bg"   cx="55" cy="55" r="44"/>
+                    <circle class="cring-fill" cx="55" cy="55" r="44"
+                      stroke="url(#ringGrad)"
+                      stroke-dasharray="276.5"
+                      stroke-dashoffset="83"
+                      id="conf-ring"/>
+                    <defs>
+                      <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%"   stop-color="#00C896"/>
+                        <stop offset="100%" stop-color="#00D4AA"/>
+                      </linearGradient>
+                    </defs>
+                  </svg>
+                  <div class="cring-label">
+                    <div class="cring-num" id="conf-num">70</div>
+                    <div class="cring-txt">Confidence</div>
+                  </div>
+                </div>
+                <div class="suggestion-pill pill-wait" id="sugg-pill">⏸ AGUARDAR</div>
+                <div style="font-size:10px;color:var(--t3);font-family:var(--mono)">Score: MODERADO · Cautela recomendada</div>
+              </div>
+
+              <!-- Setup Details -->
+              <div class="setup-grid" style="border-top:1px solid var(--border)">
+                <div class="setup-item">
+                  <div class="setup-lbl">Entrada</div>
+                  <div class="setup-val am">1.08340</div>
+                </div>
+                <div class="setup-item">
+                  <div class="setup-lbl">Stop Loss</div>
+                  <div class="setup-val neg">1.08200</div>
+                </div>
+                <div class="setup-item">
+                  <div class="setup-lbl">Take Profit</div>
+                  <div class="setup-val pos">1.08620</div>
+                </div>
+                <div class="setup-item">
+                  <div class="setup-lbl">Risk/Reward</div>
+                  <div class="setup-val tl" style="color:var(--tl)">1 : 2.0</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Analysis Text -->
+            <div class="card">
+              <div class="card-head">
+                <span class="card-title">Raciocínio da IA</span>
+              </div>
+              <div class="analysis-text">
+                <p>O EURUSD está testando a <strong>resistência em 1.0860</strong> dentro de um contexto de <span class="hl-r">tendência bearish no H4</span>. O movimento atual parece um <strong>pullback</strong> até a EMA 21 e VWAP.</p>
+                <p>Não há confirmação de reversão ainda — aguardar <span class="hl-tl">fechamento de candle</span> abaixo do suporte imediato em <strong>1.0840</strong> para considerar entrada SELL.</p>
+                <p>Volume <span class="hl-am">abaixo da média</span>, o que enfraquece qualquer setup aqui. Melhor esperar a abertura de NY.</p>
+              </div>
+
+              <!-- Factor checklist -->
+              <div class="reason-list">
+                <div class="reason-item"><span class="ri-icon ri-ok">✓</span>Tendência H4/D1 alinhada (bearish)</div>
+                <div class="reason-item"><span class="ri-icon ri-ok">✓</span>Resistência técnica clara em 1.0860</div>
+                <div class="reason-item"><span class="ri-icon ri-warn">!</span>Volume abaixo da média (–18%)</div>
+                <div class="reason-item"><span class="ri-icon ri-warn">!</span>Spread acima de 0.5 pips</div>
+                <div class="reason-item"><span class="ri-icon ri-bad">✗</span>Sem confirmação de reversão (sem pin bar/engolfo)</div>
+                <div class="reason-item"><span class="ri-icon ri-bad">✗</span>Notícia macro em 30min (CPI EUA)</div>
+              </div>
+
+              <div style="padding:10px 14px;border-top:1px solid var(--border)">
+                <div class="gap8">
+                  <button class="btn btn-ghost" style="font-size:11px">📓 Salvar Obsidian</button>
+                  <button class="btn btn-ghost" style="font-size:11px">✈ Telegram</button>
+                  <button class="btn btn-ghost" style="font-size:11px">🔊 Narrar</button>
+                </div>
+              </div>
+            </div>
+
+          </div><!-- /right col -->
+        </div><!-- /analysis-layout -->
+      </div><!-- /pg-analysis -->
+
+
+      <!-- ══════════════════════════════════════
+           ② CHAT
+      ══════════════════════════════════════ -->
+      <div id="pg-chat" class="page" style="padding:0;display:none;flex-direction:column">
+        <div class="chat-area" id="chat-area">
+
+          <!-- JARVIS intro -->
+          <div class="msg msg-jarvis">
+            <div class="msg-name">JARVIS</div>
+            <div class="msg-bubble jarvis-bubble">
+              Bom dia. Analisei o mercado esta manhã — o EURUSD está em zona de decisão técnica. Sessão europeia com volume abaixo da média. Nenhum setup de alta convicção por enquanto.<br><br>
+              Use <strong>@analisar [screenshot]</strong> para análise completa, ou me pergunte sobre qualquer ativo.
+              <div class="chat-confidence">
+                <span style="color:var(--t4)">Sistema:</span>
+                <span style="color:var(--green)">Claude 3.7 · online</span>
+                <span style="color:var(--t4)">·</span>
+                <span style="color:var(--am)">Obsidian: 142 notas</span>
+              </div>
+            </div>
+            <div class="msg-meta">09:15:42</div>
+          </div>
+
+          <!-- User message -->
+          <div class="msg msg-user">
+            <div class="msg-name" style="color:var(--t4)">você</div>
+            <div class="msg-bubble user-bubble">
+              Qual foi meu win rate nos últimos 30 dias no EURUSD?
+            </div>
+            <div class="msg-meta">09:18:03</div>
+          </div>
+
+          <!-- JARVIS response with data -->
+          <div class="msg msg-jarvis" style="max-width:88%">
+            <div class="msg-name">JARVIS</div>
+            <div class="msg-bubble jarvis-bubble">
+              Consultei o Obsidian e SQLite — aqui está o resumo:<br><br>
+              <div style="background:var(--s3);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-family:var(--mono);font-size:11px;margin:6px 0">
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:8px">
+                  <div><div style="color:var(--t4);font-size:9px">WIN RATE</div><div style="color:var(--green);font-size:16px;font-weight:700">64%</div></div>
+                  <div><div style="color:var(--t4);font-size:9px">TRADES</div><div style="color:var(--t1);font-size:16px;font-weight:700">22</div></div>
+                  <div><div style="color:var(--t4);font-size:9px">P&L</div><div style="color:var(--green);font-size:16px;font-weight:700">+4.8R</div></div>
+                  <div><div style="color:var(--t4);font-size:9px">PROFIT F.</div><div style="color:var(--am);font-size:16px;font-weight:700">1.74</div></div>
+                </div>
+                <div style="color:var(--t3)">Melhor setup: <span style="color:var(--tl)">Pullback EMA</span> (71% wr · 12 trades)</div>
+                <div style="color:var(--t3)">Pior horário: <span style="color:var(--red)">09:00–10:00 BRT</span> (abertura europeia)</div>
+              </div>
+              Seu Profit Factor de <strong>1.74</strong> está sólido. O ponto de atenção é a queda no final da tarde — últimos 5 trades entre 16h–18h: 2W/3L. Revise se há fadiga de tela nesse horário.
+            </div>
+            <div class="msg-meta">09:18:07 · Obsidian + SQLite</div>
+          </div>
+
+          <!-- User -->
+          <div class="msg msg-user">
+            <div class="msg-name" style="color:var(--t4)">você</div>
+            <div class="msg-bubble user-bubble">O setup atual no EURUSD vale entrar?</div>
+            <div class="msg-meta">09:21:14</div>
+          </div>
+
+          <!-- JARVIS typing -->
+          <div class="msg msg-jarvis" id="typing-msg">
+            <div class="msg-name">JARVIS</div>
+            <div class="msg-bubble jarvis-bubble">
+              <div class="typing-anim">
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /chat-area -->
+
+        <!-- Quick actions -->
+        <div style="padding:10px 20px 0;border-top:1px solid var(--border);background:rgba(6,8,16,0.8)">
+          <div class="quick-actions">
+            <div class="qa-btn">▶ Analisar Setup</div>
+            <div class="qa-btn">📊 Briefing de hoje</div>
+            <div class="qa-btn">📓 Últimos trades</div>
+            <div class="qa-btn">⚠ Checklist pré-trade</div>
+            <div class="qa-btn">📈 Performance mensal</div>
+          </div>
+        </div>
+
+        <!-- Input -->
+        <div class="chat-input-bar">
+          <textarea class="chat-input" id="chat-input" placeholder="Pergunte ao JARVIS... (@analisar, @setup, @performance)" rows="1"></textarea>
+          <button class="btn btn-ghost" title="Anexar screenshot">📎</button>
+          <button class="btn btn-tl" onclick="sendMsg()">→</button>
+        </div>
+      </div><!-- /pg-chat -->
+
+
+      <!-- ══════════════════════════════════════
+           ③ TRADES
+      ══════════════════════════════════════ -->
+      <div id="pg-trades" class="page" style="display:none">
+
+        <!-- Stats Bar -->
+        <div class="stats-bar">
+          <div class="stat-card">
+            <div class="stat-lbl">P&L Hoje</div>
+            <div class="stat-val pos">+1.6R</div>
+            <div class="stat-sub">+$128 · 2W 1L</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-lbl">Win Rate</div>
+            <div class="stat-val" style="color:var(--green)">64%</div>
+            <div class="stat-sub">22 trades · 30d</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-lbl">Profit Factor</div>
+            <div class="stat-val" style="color:var(--am)">1.74</div>
+            <div class="stat-sub">acima do mínimo (1.5)</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-lbl">Max Drawdown</div>
+            <div class="stat-val neg">-2.4R</div>
+            <div class="stat-sub">dentro do limite</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-lbl">Avg R/Trade</div>
+            <div class="stat-val" style="color:var(--tl)">+0.22R</div>
+            <div class="stat-sub">expectância positiva</div>
+          </div>
+        </div>
+
+        <!-- Trade Table -->
+        <div class="card">
+          <div class="card-head">
+            <span class="card-title">Histórico de Trades</span>
+            <div class="filter-tabs" style="margin-bottom:0">
+              <div class="ftab on">Hoje</div>
+              <div class="ftab">Semana</div>
+              <div class="ftab">Mês</div>
+              <div class="ftab">Todos</div>
+            </div>
+          </div>
+          <div class="card-body np">
+            <table class="trade-table">
+              <thead>
+                <tr>
+                  <th>Data/Hora</th>
+                  <th>Ativo</th>
+                  <th>Dir.</th>
+                  <th>Setup</th>
+                  <th>TF</th>
+                  <th>Entrada</th>
+                  <th>SL</th>
+                  <th>TP</th>
+                  <th>Saída</th>
+                  <th>R/R</th>
+                  <th>Resultado</th>
+                  <th>Score</th>
+                  <th>Obsidian</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="mono" style="color:var(--t3)">15/05 · 09:42</td>
+                  <td class="mono">EURUSD</td>
+                  <td><span class="badge badge-r" style="font-size:9px">SELL</span></td>
+                  <td><span class="setup-tag">Pullback EMA</span></td>
+                  <td class="mono">M15</td>
+                  <td class="mono">1.0847</td>
+                  <td class="mono" style="color:var(--red)">1.0863</td>
+                  <td class="mono" style="color:var(--green)">1.0815</td>
+                  <td class="mono">1.0820</td>
+                  <td class="mono">1:2.0</td>
+                  <td class="mono win">+1.7R</td>
+                  <td><span class="badge badge-g" style="font-size:9px">82</span></td>
+                  <td style="font-size:11px;color:var(--tl)">📓</td>
+                </tr>
+                <tr>
+                  <td class="mono" style="color:var(--t3)">15/05 · 08:15</td>
+                  <td class="mono">GBPUSD</td>
+                  <td><span class="badge badge-g" style="font-size:9px">BUY</span></td>
+                  <td><span class="setup-tag">Breakout S/R</span></td>
+                  <td class="mono">H1</td>
+                  <td class="mono">1.2668</td>
+                  <td class="mono" style="color:var(--red)">1.2645</td>
+                  <td class="mono" style="color:var(--green)">1.2714</td>
+                  <td class="mono">1.2712</td>
+                  <td class="mono">1:2.0</td>
+                  <td class="mono win">+1.9R</td>
+                  <td><span class="badge badge-g" style="font-size:9px">78</span></td>
+                  <td style="font-size:11px;color:var(--tl)">📓</td>
+                </tr>
+                <tr>
+                  <td class="mono" style="color:var(--t3)">14/05 · 15:20</td>
+                  <td class="mono">EURUSD</td>
+                  <td><span class="badge badge-r" style="font-size:9px">SELL</span></td>
+                  <td><span class="setup-tag">Topo duplo</span></td>
+                  <td class="mono">M15</td>
+                  <td class="mono">1.0852</td>
+                  <td class="mono" style="color:var(--red)">1.0868</td>
+                  <td class="mono" style="color:var(--green)">1.0820</td>
+                  <td class="mono">1.0866</td>
+                  <td class="mono">1:2.0</td>
+                  <td class="mono loss">-1.0R</td>
+                  <td><span class="badge badge-r" style="font-size:9px">55</span></td>
+                  <td style="font-size:11px;color:var(--tl)">📓</td>
+                </tr>
+                <tr>
+                  <td class="mono" style="color:var(--t3)">14/05 · 11:05</td>
+                  <td class="mono">XAUUSD</td>
+                  <td><span class="badge badge-g" style="font-size:9px">BUY</span></td>
+                  <td><span class="setup-tag">Ordem Interna</span></td>
+                  <td class="mono">M5</td>
+                  <td class="mono">2304.20</td>
+                  <td class="mono" style="color:var(--red)">2297.00</td>
+                  <td class="mono" style="color:var(--green)">2318.60</td>
+                  <td class="mono">2316.10</td>
+                  <td class="mono">1:1.66</td>
+                  <td class="mono win">+1.6R</td>
+                  <td><span class="badge badge-g" style="font-size:9px">88</span></td>
+                  <td style="font-size:11px;color:var(--tl)">📓</td>
+                </tr>
+                <tr>
+                  <td class="mono" style="color:var(--t3)">13/05 · 10:30</td>
+                  <td class="mono">USDJPY</td>
+                  <td><span class="badge badge-r" style="font-size:9px">SELL</span></td>
+                  <td><span class="setup-tag">Falha de breakout</span></td>
+                  <td class="mono">H1</td>
+                  <td class="mono">156.82</td>
+                  <td class="mono" style="color:var(--red)">157.20</td>
+                  <td class="mono" style="color:var(--green)">156.06</td>
+                  <td class="mono">156.82</td>
+                  <td class="mono">1:2.0</td>
+                  <td class="mono be">0.0R</td>
+                  <td><span class="badge badge-am" style="font-size:9px">62</span></td>
+                  <td style="font-size:11px;color:var(--tl)">📓</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div><!-- /pg-trades -->
+
+
+      <!-- ══════════════════════════════════════
+           ④ MERCADO
+      ══════════════════════════════════════ -->
+      <div id="pg-market" class="page" style="display:none">
+
+        <!-- Asset Grid -->
+        <div class="mkt-grid">
+          <div class="mkt-card sel">
+            <div class="mkt-sym">EUR/USD</div>
+            <div class="mkt-p">1.08461</div>
+            <div class="mkt-chg pos">▲ +0.0014 (+0.13%)</div>
+          </div>
+          <div class="mkt-card">
+            <div class="mkt-sym">GBP/USD</div>
+            <div class="mkt-p">1.26832</div>
+            <div class="mkt-chg neg">▼ -0.0011 (-0.08%)</div>
+          </div>
+          <div class="mkt-card">
+            <div class="mkt-sym">XAU/USD</div>
+            <div class="mkt-p">2318.40</div>
+            <div class="mkt-chg pos">▲ +7.20 (+0.31%)</div>
+          </div>
+          <div class="mkt-card">
+            <div class="mkt-sym">USD/JPY</div>
+            <div class="mkt-p">156.724</div>
+            <div class="mkt-chg neg">▼ -0.344 (-0.22%)</div>
+          </div>
+          <div class="mkt-card">
+            <div class="mkt-sym">US100</div>
+            <div class="mkt-p">18,240.5</div>
+            <div class="mkt-chg pos">▲ +98.0 (+0.54%)</div>
+          </div>
+          <div class="mkt-card">
+            <div class="mkt-sym">WTI</div>
+            <div class="mkt-p">78.32</div>
+            <div class="mkt-chg pos">▲ +0.52 (+0.67%)</div>
+          </div>
+        </div>
+
+        <div class="g2">
+          <!-- Multi-TF Alignment -->
+          <div class="card">
+            <div class="card-head">
+              <span class="card-title tl">Multi-Timeframe — EURUSD</span>
+              <span class="badge badge-r">Bearish dominante</span>
+            </div>
+            <div class="tf-align-grid">
+              <div class="tfa"><div class="tfa-name">MN</div><div class="tfa-trend tfa-down">↓ BEAR</div></div>
+              <div class="tfa"><div class="tfa-name">W1</div><div class="tfa-trend tfa-down">↓ BEAR</div></div>
+              <div class="tfa"><div class="tfa-name">D1</div><div class="tfa-trend tfa-down">↓ BEAR</div></div>
+              <div class="tfa"><div class="tfa-name">H4</div><div class="tfa-trend tfa-side">→ LATE</div></div>
+              <div class="tfa"><div class="tfa-name">H1</div><div class="tfa-trend tfa-side">→ LATE</div></div>
+              <div class="tfa"><div class="tfa-name">M15</div><div class="tfa-trend tfa-up">↑ PBK</div></div>
+            </div>
+            <div style="padding:8px 14px 12px;font-size:11px;color:var(--t3)">
+              Pullback em andamento no M15 dentro de tendência bearish D1. Aguardar exaustão do pullback para SELL.
+            </div>
+          </div>
+
+          <!-- Sessions -->
+          <div class="card">
+            <div class="card-head">
+              <span class="card-title am">Sessões de Mercado</span>
+              <span class="badge badge-g">London + NY abertas</span>
+            </div>
+            <div class="card-body" style="padding-top:8px">
+              <div class="session-bar">
+                <div class="session-seg sess-sydney" style="opacity:.4">SYD</div>
+                <div class="session-seg sess-tokyo" style="opacity:.4">TOK</div>
+                <div class="session-seg sess-london">LON ●</div>
+                <div class="session-seg sess-overlap">OVL</div>
+                <div class="session-seg sess-ny">NY ●</div>
+              </div>
+              <div style="display:flex;gap:12px;font-size:10px;font-family:var(--mono);color:var(--t3);padding:8px 0">
+                <span><span style="color:var(--tl)">●</span> London: 06:00–15:00 BRT</span>
+                <span><span style="color:var(--red)">●</span> NY: 10:00–19:00 BRT</span>
+              </div>
+              <div style="font-size:10px;color:var(--am);font-family:var(--mono)">⚠ Overlap ativo — alta volatilidade</div>
+            </div>
+
+            <!-- Macro Calendar -->
+            <div class="card-head" style="margin-top:4px"><span class="card-title">Calendário Macro Hoje</span></div>
+            <div>
+              <div class="watchlist-item">
+                <div class="wi-left">
+                  <div class="wi-sym">CPI EUA (MoM)</div>
+                  <div class="wi-setup">15:30 BRT · 🔴 Alto impacto</div>
+                </div>
+                <div class="wi-right">
+                  <div class="wi-tf" style="color:var(--am)">Prev: +0.3%</div>
+                  <div class="wi-tf" style="color:var(--t3)">Ant: +0.4%</div>
+                </div>
+              </div>
+              <div class="watchlist-item">
+                <div class="wi-left">
+                  <div class="wi-sym">Initial Jobless Claims</div>
+                  <div class="wi-setup">15:30 BRT · 🟡 Médio impacto</div>
+                </div>
+                <div class="wi-right">
+                  <div class="wi-tf" style="color:var(--t2)">Prev: 215k</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /pg-market -->
+
+
+      <!-- ══════════════════════════════════════
+           ⑤ PERFORMANCE
+      ══════════════════════════════════════ -->
+      <div id="pg-perf" class="page" style="display:none">
+
+        <div class="perf-top">
+          <!-- Win Rate Gauge -->
+          <div class="card">
+            <div class="card-head"><span class="card-title g">Win Rate</span></div>
+            <div class="wr-gauge">
+              <svg width="140" height="100" viewBox="0 0 140 100">
+                <path d="M 20 90 A 50 50 0 0 1 120 90" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="14" stroke-linecap="round"/>
+                <path d="M 20 90 A 50 50 0 0 1 120 90" fill="none" stroke="url(#gaugGrad)" stroke-width="14" stroke-linecap="round"
+                  stroke-dasharray="160" stroke-dashoffset="56"/>
+                <defs>
+                  <linearGradient id="gaugGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#00C896"/>
+                    <stop offset="100%" stop-color="#00D4AA"/>
+                  </linearGradient>
+                </defs>
+                <text x="70" y="78" text-anchor="middle" font-family="JetBrains Mono" font-size="22" font-weight="700" fill="#00C896">64%</text>
+                <text x="70" y="94" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="rgba(255,255,255,0.3)">22 TRADES</text>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Metrics -->
+          <div class="card">
+            <div class="card-head"><span class="card-title">Métricas Gerais — 30 dias</span></div>
+            <div class="metric-rows">
+              <div class="mrow"><span class="mrow-lbl">Profit Factor</span><span class="mrow-val" style="color:var(--am)">1.74</span></div>
+              <div class="mrow"><span class="mrow-lbl">Expectância (por trade)</span><span class="mrow-val" style="color:var(--tl)">+0.22R</span></div>
+              <div class="mrow"><span class="mrow-lbl">Max Drawdown</span><span class="mrow-val" style="color:var(--red)">-2.4R</span></div>
+              <div class="mrow"><span class="mrow-lbl">Melhor trade</span><span class="mrow-val" style="color:var(--green)">+2.8R</span></div>
+              <div class="mrow"><span class="mrow-lbl">Pior trade</span><span class="mrow-val" style="color:var(--red)">-1.2R</span></div>
+              <div class="mrow"><span class="mrow-lbl">Média holding time</span><span class="mrow-val">48 min</span></div>
+              <div class="mrow"><span class="mrow-lbl">Trades por semana</span><span class="mrow-val">5.5</span></div>
+            </div>
+          </div>
+
+          <!-- By Setup -->
+          <div class="card">
+            <div class="card-head"><span class="card-title">Por Setup</span></div>
+            <div>
+              <div class="watchlist-item">
+                <div class="wi-left"><div class="wi-sym" style="font-size:11px">Pullback EMA</div></div>
+                <div class="wi-right">
+                  <div style="font-family:var(--mono);font-size:10px;color:var(--green)">71% · 12T · +3.2R</div>
+                </div>
+              </div>
+              <div class="watchlist-item">
+                <div class="wi-left"><div class="wi-sym" style="font-size:11px">Breakout S/R</div></div>
+                <div class="wi-right">
+                  <div style="font-family:var(--mono);font-size:10px;color:var(--am)">58% · 5T · +0.8R</div>
+                </div>
+              </div>
+              <div class="watchlist-item">
+                <div class="wi-left"><div class="wi-sym" style="font-size:11px">Ordem Interna</div></div>
+                <div class="wi-right">
+                  <div style="font-family:var(--mono);font-size:10px;color:var(--green)">75% · 4T · +1.6R</div>
+                </div>
+              </div>
+              <div class="watchlist-item">
+                <div class="wi-left"><div class="wi-sym" style="font-size:11px">Falha de Breakout</div></div>
+                <div class="wi-right">
+                  <div style="font-family:var(--mono);font-size:10px;color:var(--red)">0% · 1T · -1.0R</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- P&L por dia -->
+        <div class="card">
+          <div class="card-head"><span class="card-title">P&L por Dia — Últimas 2 semanas</span></div>
+          <div class="pnl-bars">
+            <div class="pnl-bar-row"><div class="pnl-day">05/05</div><div class="pnl-bar-track"><div class="pnl-bar-fill pnl-bar-pos" style="width:80%"></div></div><div class="pnl-val pos">+2.1R</div></div>
+            <div class="pnl-bar-row"><div class="pnl-day">06/05</div><div class="pnl-bar-track"><div class="pnl-bar-fill pnl-bar-neg" style="width:40%"></div></div><div class="pnl-val neg">-1.0R</div></div>
+            <div class="pnl-bar-row"><div class="pnl-day">07/05</div><div class="pnl-bar-track"><div class="pnl-bar-fill pnl-bar-pos" style="width:55%"></div></div><div class="pnl-val pos">+1.4R</div></div>
+            <div class="pnl-bar-row"><div class="pnl-day">08/05</div><div class="pnl-bar-track"><div class="pnl-bar-fill pnl-bar-pos" style="width:30%"></div></div><div class="pnl-val pos">+0.8R</div></div>
+            <div class="pnl-bar-row"><div class="pnl-day">09/05</div><div class="pnl-bar-track"><div class="pnl-bar-fill pnl-bar-neg" style="width:20%"></div></div><div class="pnl-val neg">-0.5R</div></div>
+            <div class="pnl-bar-row"><div class="pnl-day">12/05</div><div class="pnl-bar-track"><div class="pnl-bar-fill pnl-bar-pos" style="width:100%"></div></div><div class="pnl-val pos">+2.8R</div></div>
+            <div class="pnl-bar-row"><div class="pnl-day">13/05</div><div class="pnl-bar-track"><div class="pnl-bar-fill pnl-bar-pos" style="width:15%"></div></div><div class="pnl-val pos">+0.3R</div></div>
+            <div class="pnl-bar-row"><div class="pnl-day">14/05</div><div class="pnl-bar-track"><div class="pnl-bar-fill pnl-bar-neg" style="width:38%"></div></div><div class="pnl-val neg">-1.0R</div></div>
+            <div class="pnl-bar-row"><div class="pnl-day">15/05</div><div class="pnl-bar-track"><div class="pnl-bar-fill pnl-bar-pos" style="width:62%"></div></div><div class="pnl-val pos" id="today-pnl">+1.6R</div></div>
+          </div>
+        </div>
+      </div><!-- /pg-perf -->
+
+
+      <!-- ══════════════════════════════════════
+           ⑥ BRIEFING
+      ══════════════════════════════════════ -->
+      <div id="pg-briefing" class="page" style="display:none">
+        <div class="g2">
+          <div>
+            <div class="card mb8">
+              <div class="card-head">
+                <span class="card-title tl">Briefing Matinal — 15 Mai 2025</span>
+                <span class="badge badge-s">Gerado 07:02 · JARVIS</span>
+              </div>
+              <div class="briefing-text">
+                <h3>Contexto Macro</h3>
+                <p><strong>USD em foco hoje.</strong> Dados de CPI EUA às 15:30 BRT são o evento principal. Consenso espera leitura de <strong>+0.3% MoM</strong>. Leitura acima do esperado → USD forte → pressão em EUR/GBP; abaixo → risk-on, ouro pode subir.</p>
+
+                <h3>Mercados na abertura europeia</h3>
+                <p>EURUSD abre <strong>1.0842</strong>, ligeiramente acima do suporte de ontem. Volume abaixo da média — mercado em compasso de espera pelo CPI. XAUUSD mostra força relativa, próximo de <span style="color:var(--am)">2318</span>.</p>
+
+                <h3>Análise JARVIS</h3>
+                <p>Com base no histórico dos seus últimos 22 trades: <strong>evite operar 45 min antes e depois do CPI.</strong> Seu win rate no EURUSD cai para 31% em dias de macro high-impact.</p>
+
+                <p>Se o CPI vier abaixo: observar XAUUSD para BUY no M15 após confirmação. Se vier acima: EURUSD SELL na resistência 1.0860 pode ser o setup do dia.</p>
+
+                <h3>Setup em Observação</h3>
+                <p><strong>EURUSD</strong> — Pullback no M15 até a EMA21 após CPI. Aguardar sinal de rejeição em 1.0855–1.0862. Entrada SELL com SL 1.0872, TP 1.0812 (R:R 1:2.4).</p>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="card mb8">
+              <div class="card-head">
+                <span class="card-title am">Watchlist Hoje</span>
+              </div>
+              <div>
+                <div class="watchlist-item">
+                  <div class="wi-left">
+                    <div class="wi-sym">EURUSD</div>
+                    <div class="wi-setup">Pullback EMA após CPI · Setup SELL</div>
+                  </div>
+                  <div class="wi-right">
+                    <div class="wi-tf" style="color:var(--red)">M15 · BEAR</div>
+                    <div class="wi-tf" style="color:var(--am)">Score: 62</div>
+                  </div>
+                </div>
+                <div class="watchlist-item">
+                  <div class="wi-left">
+                    <div class="wi-sym">XAUUSD</div>
+                    <div class="wi-setup">BUY se CPI fraco · suporte 2300</div>
+                  </div>
+                  <div class="wi-right">
+                    <div class="wi-tf" style="color:var(--green)">H1 · BULL</div>
+                    <div class="wi-tf" style="color:var(--am)">Score: 70</div>
+                  </div>
+                </div>
+                <div class="watchlist-item">
+                  <div class="wi-left">
+                    <div class="wi-sym">GBPUSD</div>
+                    <div class="wi-setup">Range consolidando · evitar</div>
+                  </div>
+                  <div class="wi-right">
+                    <div class="wi-tf" style="color:var(--am)">H4 · SIDE</div>
+                    <div class="wi-tf" style="color:var(--t3)">Score: 41</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-head"><span class="card-title">Reflexão Pós-Trade Ontem</span></div>
+              <div class="briefing-text" style="font-size:12px">
+                <p>Ontem à tarde entrei em 2 trades abaixo do meu score mínimo (≥65). Os dois deram loss. <strong>Padrão identificado:</strong> trades feitos entre 16h–17h30 com score abaixo de 60 têm win rate histórico de 22%.</p>
+                <p><strong>Regra reforçada:</strong> Nenhuma entrada com Confidence Score abaixo de 65. Sem exceções.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /pg-briefing -->
+
+
+      <!-- ══════════════════════════════════════
+           ⑦ CHECKLIST
+      ══════════════════════════════════════ -->
+      <div id="pg-checklist" class="page" style="display:none">
+        <div class="checklist-layout">
+
+          <!-- Left: Checklist -->
+          <div class="card">
+            <div class="card-head">
+              <span class="card-title tl">Checklist Pré-Trade</span>
+              <span class="badge badge-am" id="chk-score-badge">Score: 6/14</span>
+            </div>
+
+            <div class="check-score-bar">
+              <div class="check-score-fill score-mid" id="chk-bar" style="width:43%"></div>
+            </div>
+            <div class="score-label" id="chk-label">⚠ MODERADO — Complete mais itens</div>
+
+            <!-- Grupo 1 -->
+            <div class="check-group">
+              <div class="check-group-title">Contexto & Setup</div>
+              <div class="check-item checked" onclick="toggleCheck(this)">
+                <div class="check-box"></div>
+                <div class="check-text">Tendência HTF identificada e alinhada com o trade</div>
+              </div>
+              <div class="check-item checked" onclick="toggleCheck(this)">
+                <div class="check-box"></div>
+                <div class="check-text">Suporte/Resistência clara no ponto de entrada</div>
+              </div>
+              <div class="check-item" onclick="toggleCheck(this)">
+                <div class="check-box"></div>
+                <div class="check-text">Multi-timeframe: pelo menos 2 TFs alinhados</div>
+              </div>
+              <div class="check-item checked" onclick="toggleCheck(this)">
+                <div class="check-box"></div>
+                <div class="check-text">Setup tem nome e histórico (não é impulsivo)</div>
+              </div>
+            </div>
+
+            <!-- Grupo 2 -->
+            <div class="check-group">
+              <div class="check-group-title">Risco & Gestão</div>
+              <div class="check-item checked" onclick="toggleCheck(this)">
+                <div class="check-box"></div>
+                <div class="check-text">Stop Loss definido ANTES da entrada</div>
+              </div>
+              <div class="check-item checked" onclick="toggleCheck(this)">
+                <div class="check-box"></div>
+                <div class="check-text">R/R mínimo de 1:1.5 calculado</div>
+              </div>
+              <div class="check-item" onclick="toggleCheck(this)">
+                <div class="check-box"></div>
+                <div class="check-text">Tamanho de posição calculado (risco ≤ 1% conta)</div>
+              </div>
+              <div class="check-item" onclick="toggleCheck(this)">
+                <div class="check-box"></div>
+                <div class="check-text">Drawdown diário ainda não atingido (≤ -3R)</div>
+              </div>
+            </div>
+
+            <!-- Grupo 3 -->
+            <div class="check-group">
+              <div class="check-group-title">Anti-FOMO / Contexto Emocional</div>
+              <div class="check-item" onclick="toggleCheck(this)">
+                <div class="check-box"></div>
+                <div class="check-text">Não estou operando para recuperar loss anterior</div>
+              </div>
+              <div class="check-item checked" onclick="toggleCheck(this)">
+                <div class="check-box"></div>
+                <div class="check-text">Não há evento macro em menos de 30 minutos</div>
+              </div>
+              <div class="check-item" onclick="toggleCheck(this)">
+                <div class="check-box"></div>
+                <div class="check-text">Horário dentro da janela operacional ideal</div>
+              </div>
+              <div class="check-item" onclick="toggleCheck(this)">
+                <div class="check-box"></div>
+                <div class="check-text">Não é a 1ª candle de abertura de sessão</div>
+              </div>
+            </div>
+
+            <!-- Grupo 4 -->
+            <div class="check-group">
+              <div class="check-group-title">Confirmação Final</div>
+              <div class="check-item" onclick="toggleCheck(this)">
+                <div class="check-box"></div>
+                <div class="check-text">Confidence Score JARVIS ≥ 65</div>
+              </div>
+              <div class="check-item" onclick="toggleCheck(this)">
+                <div class="check-box"></div>
+                <div class="check-text">Plano de saída definido (onde fechar parcial / total)</div>
+              </div>
+            </div>
+
+            <div style="padding:12px 14px;border-top:1px solid var(--border);display:flex;gap:8px">
+              <button class="btn btn-tl" style="flex:1" onclick="approveChecklist()">✓ Aprovar para Entrada</button>
+              <button class="btn btn-ghost" onclick="resetChecklist()">Resetar</button>
+            </div>
+          </div>
+
+          <!-- Right: Risk Calc + Anti-FOMO -->
+          <div style="display:flex;flex-direction:column;gap:14px">
+
+            <!-- Risk Calculator -->
+            <div class="card">
+              <div class="card-head"><span class="card-title am">Calculadora de Risco</span></div>
+              <div class="risk-inputs">
+                <div class="risk-field">
+                  <label>Banca (R$)</label>
+                  <input type="number" value="10000" id="r-banca" oninput="calcRisk()">
+                </div>
+                <div class="risk-field">
+                  <label>Risco % por trade</label>
+                  <input type="number" value="1" step="0.1" id="r-pct" oninput="calcRisk()">
+                </div>
+                <div class="risk-field">
+                  <label>Entrada</label>
+                  <input type="number" value="1.08340" step="0.00001" id="r-entry" oninput="calcRisk()">
+                </div>
+                <div class="risk-field">
+                  <label>Stop Loss</label>
+                  <input type="number" value="1.08200" step="0.00001" id="r-sl" oninput="calcRisk()">
+                </div>
+                <div class="risk-field">
+                  <label>Take Profit</label>
+                  <input type="number" value="1.08620" step="0.00001" id="r-tp" oninput="calcRisk()">
+                </div>
+                <div class="risk-field">
+                  <label>Lote padrão</label>
+                  <input type="number" value="100000" id="r-lot" oninput="calcRisk()">
+                </div>
+              </div>
+              <div class="risk-result">
+                <div class="risk-row">
+                  <span class="risk-row-lbl">Risco em R$</span>
+                  <span class="risk-row-val" id="r-val-risk" style="color:var(--red)">R$ 100,00</span>
+                </div>
+                <div class="risk-row">
+                  <span class="risk-row-lbl">Pips de risco</span>
+                  <span class="risk-row-val" id="r-val-pips" style="color:var(--am)">14.0 pips</span>
+                </div>
+                <div class="risk-row">
+                  <span class="risk-row-lbl">Tamanho de lote</span>
+                  <span class="risk-row-val" id="r-val-lots" style="color:var(--tl)">0.07 lots</span>
+                </div>
+                <div class="risk-row">
+                  <span class="risk-row-lbl">Potencial lucro</span>
+                  <span class="risk-row-val" id="r-val-profit" style="color:var(--green)">R$ 200,00</span>
+                </div>
+                <div class="risk-row">
+                  <span class="risk-row-lbl">Risk/Reward</span>
+                  <span class="risk-row-val" id="r-val-rr">1 : 2.0</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Anti-FOMO Filter -->
+            <div class="card">
+              <div class="card-head">
+                <span class="card-title r">Anti-FOMO Filter</span>
+                <span class="badge badge-r" id="fomo-verdict">⚠ Atenção</span>
+              </div>
+              <div>
+                <div class="fomo-item">
+                  <span class="fomo-label">Operando após loss consecutivo?</span>
+                  <span class="fomo-status fs-warn">1 loss hoje</span>
+                </div>
+                <div class="fomo-item">
+                  <span class="fomo-label">Horário de risco (abert./fech.)?</span>
+                  <span class="fomo-status fs-ok">Não</span>
+                </div>
+                <div class="fomo-item">
+                  <span class="fomo-label">Macro nos próximos 30min?</span>
+                  <span class="fomo-status fs-bad">CPI em 22min</span>
+                </div>
+                <div class="fomo-item">
+                  <span class="fomo-label">Número de trades hoje?</span>
+                  <span class="fomo-status fs-ok">3 (limite: 5)</span>
+                </div>
+                <div class="fomo-item">
+                  <span class="fomo-label">Drawdown diário?</span>
+                  <span class="fomo-status fs-ok">-0.4R de -3R</span>
+                </div>
+                <div class="fomo-item">
+                  <span class="fomo-label">Setup foi no backlog ou impulsivo?</span>
+                  <span class="fomo-status fs-ok">Backlog</span>
+                </div>
+              </div>
+              <div style="padding:10px 14px;border-top:1px solid var(--border);font-size:11px;color:var(--am)">
+                ⚠ CPI em menos de 30 min — aguardar divulgação antes de entrar.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /pg-checklist -->
+
+
+      <!-- ══════════════════════════════════════
+           ⑧ CONFIG
+      ══════════════════════════════════════ -->
+      <div id="pg-config" class="page" style="display:none">
+        <div class="g2">
+
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div class="card">
+              <div class="card-head"><span class="card-title">Chaves de API</span></div>
+              <div class="config-section">
+                <div class="config-row">
+                  <div><div class="config-lbl">Anthropic API Key</div><div class="config-sub">claude-3-7-sonnet</div></div>
+                  <div class="config-val config-masked">sk-ant-••••••••••••••rQ3A</div>
+                </div>
+                <div class="config-row">
+                  <div><div class="config-lbl">MT5 Login</div><div class="config-sub">MetaTrader 5 · XM</div></div>
+                  <div class="config-val config-masked">••••••••12</div>
+                </div>
+                <div class="config-row">
+                  <div><div class="config-lbl">Telegram Bot Token</div><div class="config-sub">Notificações</div></div>
+                  <div class="config-val config-masked">bot••••••••:••••••AAAA</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-head"><span class="card-title">Confidence Engine</span></div>
+              <div class="config-section">
+                <div class="config-row">
+                  <div><div class="config-lbl">Score mínimo para entrada</div></div>
+                  <div class="config-val" style="color:var(--tl)">65</div>
+                </div>
+                <div class="config-row">
+                  <div><div class="config-lbl">Score alto convicção</div></div>
+                  <div class="config-val" style="color:var(--green)">80</div>
+                </div>
+                <div class="config-row">
+                  <div><div class="config-lbl">Peso: Tendência HTF</div></div>
+                  <div class="config-val">30%</div>
+                </div>
+                <div class="config-row">
+                  <div><div class="config-lbl">Peso: Volume</div></div>
+                  <div class="config-val">20%</div>
+                </div>
+                <div class="config-row">
+                  <div><div class="config-lbl">Peso: Confluência S/R</div></div>
+                  <div class="config-val">25%</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div class="card">
+              <div class="card-head"><span class="card-title">Features</span></div>
+              <div class="config-section">
+                <div class="config-row">
+                  <div><div class="config-lbl">Notificações Telegram</div></div>
+                  <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+                </div>
+                <div class="config-row">
+                  <div><div class="config-lbl">TTS (narração de alertas)</div></div>
+                  <div class="toggle" onclick="this.classList.toggle('on')"></div>
+                </div>
+                <div class="config-row">
+                  <div><div class="config-lbl">Briefing automático (07:00)</div></div>
+                  <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+                </div>
+                <div class="config-row">
+                  <div><div class="config-lbl">Salvar no Obsidian</div></div>
+                  <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+                </div>
+                <div class="config-row">
+                  <div><div class="config-lbl">Dataset SQLite</div></div>
+                  <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+                </div>
+                <div class="config-row">
+                  <div><div class="config-lbl">Anti-FOMO Filter</div></div>
+                  <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-head"><span class="card-title g">Status do Sistema</span></div>
+              <div class="config-section">
+                <div class="config-row">
+                  <div><div class="config-lbl">Claude API</div></div>
+                  <div class="status-indicator"><span class="sys-dot ok"></span><span style="color:var(--green)">Online · 342ms</span></div>
+                </div>
+                <div class="config-row">
+                  <div><div class="config-lbl">MT5 Connection</div></div>
+                  <div class="status-indicator"><span class="sys-dot ok"></span><span style="color:var(--green)">Conectado · EURUSD</span></div>
+                </div>
+                <div class="config-row">
+                  <div><div class="config-lbl">Obsidian Vault</div></div>
+                  <div class="status-indicator"><span class="sys-dot warn"></span><span style="color:var(--am)">Sync pendente</span></div>
+                </div>
+                <div class="config-row">
+                  <div><div class="config-lbl">Scheduler</div></div>
+                  <div class="status-indicator"><span class="sys-dot ok"></span><span style="color:var(--green)">4 jobs ativos</span></div>
+                </div>
+                <div class="config-row">
+                  <div><div class="config-lbl">SQLite DB</div></div>
+                  <div class="status-indicator"><span class="sys-dot ok"></span><span style="color:var(--green)">22 registros</span></div>
+                </div>
+                <div class="config-row">
+                  <div><div class="config-lbl">Fase atual</div></div>
+                  <div class="badge badge-tl" style="font-size:9px">FASE 1 — MVP</div>
+                </div>
+              </div>
+              <div style="padding:10px 14px;border-top:1px solid var(--border)">
+                <button class="btn btn-ghost" style="font-size:11px;width:100%">🔄 Testar todas as conexões</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /pg-config -->
+
+    </div><!-- /content -->
+  </main>
+</div><!-- /shell -->
+
+
+<!-- ══════════════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════════════ -->
+<script>
+/* ── CLOCK ── */
+function tick() {
+  const now = new Date();
+  const t = now.toLocaleTimeString('pt-BR', {hour12:false});
+  document.getElementById('clock').textContent = t;
+}
+tick(); setInterval(tick, 1000);
+
+/* ── NAVIGATION ── */
+const pageConfig = {
+  analysis: { title:'Análise Técnica', sym:'EURUSD', tf:'M15', extra:'HTF: Bearish ↓' },
+  chat:      { title:'Chat — JARVIS',  sym:'—', tf:'—', extra:'Claude 3.7' },
+  trades:    { title:'Histórico de Trades', sym:'30d', tf:'22 trades', extra:'WR: 64%' },
+  market:    { title:'Mercado ao Vivo',  sym:'EURUSD', tf:'M15', extra:'Sessão: London+NY' },
+  perf:      { title:'Performance',     sym:'30 dias', tf:'22 trades', extra:'PF: 1.74' },
+  briefing:  { title:'Briefing Matinal', sym:'15 Mai', tf:'JARVIS AI', extra:'Gerado 07:02' },
+  checklist: { title:'Checklist Pré-Trade', sym:'EURUSD', tf:'M15', extra:'Anti-FOMO ativo' },
+  config:    { title:'Configurações',   sym:'Sistema', tf:'v1.0', extra:'Fase 1 · MVP' },
+};
+
+function nav(page, btn) {
+  // Hide all pages
+  document.querySelectorAll('.page').forEach(p => {
+    p.style.display = 'none';
+    p.classList.remove('on');
+  });
+
+  // Show target
+  const pg = document.getElementById('pg-' + page);
+  if (pg) {
+    pg.style.display = page === 'chat' ? 'flex' : 'block';
+    pg.classList.add('on');
+  }
+
+  // Update nav active
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('on'));
+  if (btn) btn.classList.add('on');
+
+  // Update topbar
+  const cfg = pageConfig[page] || {};
+  document.getElementById('page-title').textContent = cfg.title || page;
+  document.getElementById('topbar-sym').textContent = cfg.sym || '';
+  document.getElementById('topbar-tf').textContent = cfg.tf || '';
+  document.getElementById('topbar-extra').textContent = cfg.extra || '';
+
+  // Scroll to top
+  if (pg) pg.scrollTop = 0;
+}
+
+/* ── LIVE PRICE SIMULATION ── */
+let basePrice = 1.08461;
+let dir = 1;
+
+function updatePrice() {
+  const noise = (Math.random() - 0.5) * 0.00018 * dir;
+  basePrice += noise;
+  if (Math.random() < 0.05) dir *= -1;
+  basePrice = Math.max(1.0820, Math.min(1.0880, basePrice));
+
+  const p = basePrice.toFixed(5);
+  const diff = (basePrice - 1.08347).toFixed(4);
+  const pct  = ((basePrice - 1.08347) / 1.08347 * 100).toFixed(2);
+  const isPos = parseFloat(diff) > 0;
+
+  const priceEl = document.getElementById('sb-price');
+  const chgEl   = document.getElementById('sb-chg');
+  const bidEl   = document.getElementById('sb-bid');
+  const askEl   = document.getElementById('sb-ask');
+  const chartP  = document.getElementById('chart-price');
+
+  if (priceEl) priceEl.textContent = p;
+  if (chartP)  chartP.textContent = p;
+  if (bidEl)   bidEl.textContent  = (basePrice - 0.00003).toFixed(5);
+  if (askEl)   askEl.textContent  = (basePrice + 0.00003).toFixed(5);
+  if (chgEl) {
+    chgEl.textContent  = (isPos ? '▲ +' : '▼ ') + diff + ' (' + (isPos ? '+' : '') + pct + '%)';
+    chgEl.className    = 'mt5-chg ' + (isPos ? 'pos' : 'neg');
+  }
+}
+
+setInterval(updatePrice, 1200);
+
+/* ── DRAW CANDLES ── */
+function drawCandles() {
+  const svg = document.getElementById('candles');
+  if (!svg) return;
+
+  const candles = [
+    {x:20,  o:140, c:120, h:145, l:115, bull:true },
+    {x:40,  o:120, c:130, h:135, l:115, bull:true },
+    {x:60,  o:130, c:110, h:135, l:105, bull:false},
+    {x:80,  o:110, c:125, h:128, l:105, bull:true },
+    {x:100, o:125, c:118, h:128, l:114, bull:false},
+    {x:120, o:118, c:108, h:122, l:104, bull:false},
+    {x:140, o:108, c:115, h:118, l:104, bull:true },
+    {x:160, o:115, c:105, h:119, l:100, bull:false},
+    {x:180, o:105, c:112, h:115, l:100, bull:true },
+    {x:200, o:112, c:100, h:116, l:96,  bull:false},
+    {x:220, o:100, c:92,  h:104, l:88,  bull:false},
+    {x:240, o:92,  c:98,  h:102, l:88,  bull:true },
+    {x:260, o:98,  c:88,  h:102, l:84,  bull:false},
+    {x:280, o:88,  c:80,  h:92,  l:76,  bull:false},
+    {x:300, o:80,  c:86,  h:90,  l:76,  bull:true },
+    {x:320, o:86,  c:78,  h:90,  l:74,  bull:false},
+    {x:340, o:78,  c:84,  h:88,  l:74,  bull:true },
+    {x:360, o:84,  c:76,  h:88,  l:72,  bull:false},
+    {x:380, o:76,  c:82,  h:86,  l:72,  bull:true },
+    {x:400, o:82,  c:74,  h:86,  l:70,  bull:false},
+    {x:420, o:74,  c:68,  h:78,  l:64,  bull:false},
+    {x:440, o:68,  c:72,  h:76,  l:64,  bull:true },
+    {x:460, o:72,  c:66,  h:76,  l:62,  bull:false},
+    {x:480, o:66,  c:70,  h:74,  l:62,  bull:true },
+    {x:500, o:70,  c:62,  h:74,  l:58,  bull:false},
+    {x:520, o:62,  c:68,  h:72,  l:58,  bull:true },
+    {x:540, o:68,  c:60,  h:72,  l:56,  bull:false},
+    {x:560, o:60,  c:64,  h:68,  l:56,  bull:true },
+    {x:580, o:64,  c:58,  h:68,  l:54,  bull:false},
+    {x:600, o:58,  c:62,  h:66,  l:54,  bull:true },
+    {x:620, o:62,  c:56,  h:66,  l:52,  bull:false},
+    {x:640, o:56,  c:60,  h:64,  l:52,  bull:true },
+    {x:660, o:60,  c:54,  h:64,  l:50,  bull:false},
+    {x:680, o:54,  c:58,  h:62,  l:50,  bull:true },
+  ];
+
+  let html = '';
+  const W = 14;
+  candles.forEach(c => {
+    const color    = c.bull ? '#00C896' : '#FF4560';
+    const top      = Math.min(c.o, c.c);
+    const height   = Math.abs(c.o - c.c) || 2;
+    html += `<line x1="${c.x}" y1="${c.h}" x2="${c.x}" y2="${c.l}" stroke="${color}" stroke-width="1" opacity="0.6"/>`;
+    html += `<rect x="${c.x - W/2}" y="${top}" width="${W}" height="${height}" fill="${color}" opacity="0.85" rx="1"/>`;
+  });
+  svg.innerHTML = html;
+}
+
+drawCandles();
+
+/* ── ANALYSIS SIMULATION ── */
+function simulateAnalysis() {
+  const btn = document.querySelector('.btn-tl');
+  if (btn) { btn.textContent = '⏳ Analisando...'; btn.disabled = true; }
+
+  // Animate ring
+  const ring   = document.getElementById('conf-ring');
+  const numEl  = document.getElementById('conf-num');
+  const pillEl = document.getElementById('sugg-pill');
+
+  const scores = [
+    { score:82, offset:50,  pill:'pill-buy',  text:'▲ COMPRAR', color:'url(#ringGrad)' },
+    { score:70, offset:83,  pill:'pill-wait', text:'⏸ AGUARDAR', color:'url(#ringGrad)' },
+    { score:88, offset:33,  pill:'pill-buy',  text:'▲ COMPRAR', color:'url(#ringGrad)' },
+    { score:45, offset:152, pill:'pill-avoid',text:'✕ EVITAR',  color:'rgba(255,255,255,0.2)' },
+  ];
+  const r = scores[Math.floor(Math.random() * scores.length)];
+
+  setTimeout(() => {
+    if (ring)  ring.setAttribute('stroke-dashoffset', r.offset);
+    if (numEl) { let n=0; const t=setInterval(()=>{ n+=3; if(n>=r.score){n=r.score;clearInterval(t);} numEl.textContent=n; },20); }
+    if (pillEl){ pillEl.className='suggestion-pill '+r.pill; pillEl.textContent=r.text; }
+    if (btn)   { btn.textContent='▶ Analisar Screenshot'; btn.disabled=false; }
+  }, 1800);
+}
+
+/* ── CHECKLIST ── */
+let totalChecks = 14;
+
+function updateCheckScore() {
+  const items   = document.querySelectorAll('.check-item');
+  const checked = document.querySelectorAll('.check-item.checked').length;
+  const pct     = (checked / totalChecks) * 100;
+
+  const bar   = document.getElementById('chk-bar');
+  const badge = document.getElementById('chk-score-badge');
+  const label = document.getElementById('chk-label');
+
+  if (bar) {
+    bar.style.width = pct + '%';
+    bar.className   = 'check-score-fill ' + (pct>=75?'score-high':pct>=50?'score-mid':'score-low');
+  }
+  if (badge) badge.textContent = 'Score: ' + checked + '/' + totalChecks;
+  if (label) {
+    if (pct >= 85)       { label.textContent = '✓ APROVADO — Pode entrar'; label.style.color='var(--green)'; }
+    else if (pct >= 57)  { label.textContent = '⚠ MODERADO — Complete mais itens'; label.style.color='var(--am)'; }
+    else                 { label.textContent = '✗ BLOQUEADO — Muitos itens pendentes'; label.style.color='var(--red)'; }
+  }
+}
+
+function toggleCheck(el) {
+  el.classList.toggle('checked');
+  updateCheckScore();
+}
+
+function resetChecklist() {
+  document.querySelectorAll('.check-item').forEach(el => el.classList.remove('checked','blocked'));
+  updateCheckScore();
+}
+
+function approveChecklist() {
+  const checked = document.querySelectorAll('.check-item.checked').length;
+  if (checked < 10) {
+    alert('Complete pelo menos 10 itens do checklist antes de operar.');
+  } else {
+    alert('✓ Checklist aprovado! Boa sorte no trade. Lembre-se: siga o plano.');
+  }
+}
+
+/* ── RISK CALCULATOR ── */
+function calcRisk() {
+  const banca  = parseFloat(document.getElementById('r-banca')?.value)  || 10000;
+  const pct    = parseFloat(document.getElementById('r-pct')?.value)    || 1;
+  const entry  = parseFloat(document.getElementById('r-entry')?.value)  || 1.0834;
+  const sl     = parseFloat(document.getElementById('r-sl')?.value)     || 1.0820;
+  const tp     = parseFloat(document.getElementById('r-tp')?.value)     || 1.0862;
+  const lot    = parseFloat(document.getElementById('r-lot')?.value)    || 100000;
+
+  const riskR$   = banca * (pct / 100);
+  const slPips   = Math.abs(entry - sl) * 10000;
+  const tpPips   = Math.abs(tp - entry) * 10000;
+  const pipVal   = lot * 0.0001;
+  const lots     = slPips > 0 ? (riskR$ / (slPips * pipVal)) : 0;
+  const profit   = lots * tpPips * pipVal;
+  const rr       = slPips > 0 ? (tpPips / slPips).toFixed(2) : '—';
+
+  const set = (id, val) => { const el=document.getElementById(id); if(el) el.textContent=val; };
+  set('r-val-risk',   'R$ ' + riskR$.toFixed(2));
+  set('r-val-pips',   slPips.toFixed(1) + ' pips');
+  set('r-val-lots',   lots.toFixed(2) + ' lots');
+  set('r-val-profit', 'R$ ' + profit.toFixed(2));
+  set('r-val-rr',     '1 : ' + rr);
+}
+
+/* ── CHAT TYPING SIMULATION ── */
+setTimeout(() => {
+  const typer = document.getElementById('typing-msg');
+  if (!typer) return;
+
+  const area = document.getElementById('chat-area');
+  const response = document.createElement('div');
+  response.className = 'msg msg-jarvis';
+  response.innerHTML = `
+    <div class="msg-name">JARVIS</div>
+    <div class="msg-bubble jarvis-bubble">
+      Analisei o setup atual. Com a <strong>resistência em 1.0860</strong> e tendência bearish no D1, o cenário favorece SELL —
+      mas o <strong>CPI americano sai em 22 minutos</strong>. Com base no seu histórico, seus trades em EURUSD 
+      com macro iminente têm win rate de <span style="color:var(--red)">31%</span>.<br><br>
+      <strong>Recomendação JARVIS:</strong> Aguardar divulgação. Se o número vier acima do esperado, observe pullback 
+      até 1.0852–1.0858 para SELL com SL 1.0872. Confidence Score pós-evento: <span style="color:var(--green)">estimado 74–78</span>.
+    </div>
+    <div class="msg-meta">09:21:09 · Análise + histórico Obsidian</div>
+  `;
+
+  setTimeout(() => {
+    if (typer) typer.remove();
+    if (area) {
+      area.appendChild(response);
+      area.scrollTop = area.scrollHeight;
+    }
+  }, 3200);
+}, 2000);
+
+/* ── TF TABS ── */
+document.querySelectorAll('.tf-tab').forEach(tab => {
+  tab.addEventListener('click', function() {
+    document.querySelectorAll('.tf-tab').forEach(t => t.classList.remove('on'));
+    this.classList.add('on');
+  });
+});
+
+/* ── FILTER TABS ── */
+document.querySelectorAll('.ftab').forEach(tab => {
+  tab.addEventListener('click', function() {
+    document.querySelectorAll('.ftab').forEach(t => t.classList.remove('on'));
+    this.classList.add('on');
+  });
+});
+
+/* ── MARKET CARDS ── */
+document.querySelectorAll('.mkt-card').forEach(card => {
+  card.addEventListener('click', function() {
+    document.querySelectorAll('.mkt-card').forEach(c => c.classList.remove('sel'));
+    this.classList.add('sel');
+  });
+});
+
+/* ── SEND CHAT MSG ── */
+function sendMsg() {
+  const inp = document.getElementById('chat-input');
+  const area = document.getElementById('chat-area');
+  if (!inp || !inp.value.trim() || !area) return;
+
+  const userMsg = document.createElement('div');
+  userMsg.className = 'msg msg-user';
+  userMsg.innerHTML = `
+    <div class="msg-name" style="color:var(--t4)">você</div>
+    <div class="msg-bubble user-bubble">${inp.value}</div>
+    <div class="msg-meta">${new Date().toLocaleTimeString('pt-BR',{hour12:false})}</div>
+  `;
+  area.appendChild(userMsg);
+
+  const typing = document.createElement('div');
+  typing.className = 'msg msg-jarvis';
+  typing.innerHTML = `<div class="msg-name">JARVIS</div><div class="msg-bubble jarvis-bubble"><div class="typing-anim"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div>`;
+  area.appendChild(typing);
+  area.scrollTop = area.scrollHeight;
+  inp.value = '';
+
+  setTimeout(() => {
+    typing.remove();
+    const resp = document.createElement('div');
+    resp.className = 'msg msg-jarvis';
+    resp.innerHTML = `<div class="msg-name">JARVIS</div><div class="msg-bubble jarvis-bubble">Analisando... Consulte a aba <strong>Análise</strong> para o setup completo com Confidence Score.</div><div class="msg-meta">${new Date().toLocaleTimeString('pt-BR',{hour12:false})}</div>`;
+    area.appendChild(resp);
+    area.scrollTop = area.scrollHeight;
+  }, 1800);
+}
+
+document.getElementById('chat-input')?.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMsg(); }
+});
+
+/* ── INIT ── */
+calcRisk();
+updateCheckScore();
+</script>
+</body>
+</html>

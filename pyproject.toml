@@ -1,0 +1,67 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "oracle-trader-assist"
+version = "0.1.0"
+description = "AI-powered trading intelligence platform"
+requires-python = ">=3.12"
+readme = "README.md"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+# ── Ruff ────────────────────────────────────────────────────────────────────
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "N", "A", "C4", "PTH", "RUF"]
+ignore = [
+    "B008",   # FastAPI Depends() in default args — intentional pattern
+    "RUF012", # mutable ClassVar — SQLAlchemy uses this
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101"]  # asserts allowed in tests
+
+[tool.ruff.lint.isort]
+known-first-party = ["oracle"]
+
+# ── Black ───────────────────────────────────────────────────────────────────
+[tool.black]
+line-length = 100
+target-version = ["py312"]
+
+# ── Pytest ──────────────────────────────────────────────────────────────────
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "session"
+asyncio_default_test_loop_scope = "session"
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = "-v --tb=short"
+
+# ── Coverage ─────────────────────────────────────────────────────────────────
+[tool.coverage.run]
+source = ["src/oracle"]
+omit = ["*/__init__.py", "*/migrations/*"]
+
+[tool.coverage.report]
+show_missing = true
+fail_under = 60
+
+# ── Mypy ────────────────────────────────────────────────────────────────────
+[tool.mypy]
+python_version = "3.12"
+ignore_missing_imports = true
+warn_return_any = true
+warn_unused_ignores = true
+
+# ── Alembic ──────────────────────────────────────────────────────────────────
+# Alembic config is in alembic.ini — this section documents overridable options.
+# Run: alembic upgrade head
+# Generate: alembic revision --autogenerate -m "description"

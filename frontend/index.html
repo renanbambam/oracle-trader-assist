@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oracle Trader Assist</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+</head>
+<body>
+
+<div style="position:fixed;top:-80px;left:-80px;width:350px;height:350px;border-radius:50%;background:radial-gradient(circle,rgba(0,212,170,.12),transparent 70%);filter:blur(60px);pointer-events:none;z-index:0;animation:orb-drift 14s ease-in-out infinite alternate"></div>
+<div style="position:fixed;bottom:-60px;right:-60px;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(77,158,255,.08),transparent 70%);filter:blur(70px);pointer-events:none;z-index:0;animation:orb-drift 18s ease-in-out infinite alternate-reverse"></div>
+
+<div class="shell">
+
+  <!-- ── SIDEBAR ── -->
+  <aside class="sidebar">
+
+    <div class="logo">
+      <div class="logo-orb"></div>
+      <div>
+        <div class="logo-name">ORACLE</div>
+        <div class="logo-sub">Trader Assist</div>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <div class="nav-sec">Core</div>
+      <button class="nav-item on" onclick="navTo('analysis',this)"><span class="ni">◈</span>Análise</button>
+      <button class="nav-item" onclick="navTo('chat',this)"><span class="ni">⬡</span>Chat — Oracle</button>
+
+      <div class="nav-sec">Operações</div>
+      <button class="nav-item" onclick="navTo('trades',this)"><span class="ni">◉</span>Trades</button>
+      <button class="nav-item" onclick="navTo('checklist',this)"><span class="ni">☑</span>Checklist</button>
+
+      <div class="nav-sec">Mercado</div>
+      <button class="nav-item" onclick="navTo('market',this)"><span class="ni">⌖</span>Mercado ao vivo</button>
+      <button class="nav-item" onclick="navTo('briefing',this)"><span class="ni">◐</span>Briefing Matinal</button>
+
+      <div class="nav-sec">Análise</div>
+      <button class="nav-item" onclick="navTo('perf',this)"><span class="ni">▦</span>Performance</button>
+
+      <div class="nav-sec">Estudo</div>
+      <button class="nav-item" onclick="navTo('replay',this)"><span class="ni">⏵</span>Replay</button>
+
+      <div class="nav-sec">Sistema</div>
+      <button class="nav-item" onclick="navTo('config',this)"><span class="ni">⚙</span>Configurações</button>
+    </nav>
+
+    <!-- Market Widget -->
+    <div class="mt5">
+      <div class="mt5-head"><div class="live-dot"></div>MERCADO</div>
+      <div class="mt5-sym" id="mt5-sym">—</div>
+      <div class="mt5-price" id="mt5-price">—</div>
+      <div class="mt5-chg" id="mt5-chg"></div>
+      <div class="mt5-grid">
+        <div class="mt5-cell"><div class="mt5-lbl">BID</div><div class="mt5-val" id="mt5-bid">—</div></div>
+        <div class="mt5-cell"><div class="mt5-lbl">ASK</div><div class="mt5-val" id="mt5-ask">—</div></div>
+        <div class="mt5-cell"><div class="mt5-lbl">SPD</div><div class="mt5-val" id="mt5-spd">—</div></div>
+      </div>
+    </div>
+
+    <!-- System status -->
+    <div class="sys-status">
+      <div class="sys-row">
+        <span style="display:flex;align-items:center"><span class="sys-dot" id="dot-api"></span>Claude API</span>
+        <span id="status-api" style="font-size:10px">—</span>
+      </div>
+      <div class="sys-row">
+        <span style="display:flex;align-items:center"><span class="sys-dot" id="dot-ws"></span>WebSocket</span>
+        <span id="status-ws" style="font-size:10px">—</span>
+      </div>
+      <div class="sys-row">
+        <span style="display:flex;align-items:center"><span class="sys-dot" id="dot-db"></span>Database</span>
+        <span id="status-db" style="font-size:10px">—</span>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- ── MAIN ── -->
+  <main class="main">
+
+    <!-- Topbar -->
+    <div class="topbar">
+      <div class="topbar-l">
+        <div class="page-title" id="page-title">Análise Técnica</div>
+        <span class="badge badge-tl" id="topbar-sym" style="display:none"></span>
+        <span class="badge badge-am" id="topbar-tf" style="display:none"></span>
+        <span class="badge badge-s" id="topbar-extra" style="display:none"></span>
+      </div>
+      <div class="topbar-r">
+        <span class="badge badge-g" id="claude-badge">● CLAUDE ONLINE</span>
+        <div class="clock" id="clock">--:--:--</div>
+        <div class="topbar-btn" title="Notificações" onclick="toast('Sem novas notificações')">🔔</div>
+      </div>
+    </div>
+
+    <!-- Ticker -->
+    <div class="ticker-wrap">
+      <div class="ticker-inner" id="ticker">
+        <span class="tick-item"><span class="tick-sym">PETR4</span><span class="tick-p" id="tk-PETR4">—</span></span>
+        <span class="tick-item"><span class="tick-sym">VALE3</span><span class="tick-p" id="tk-VALE3">—</span></span>
+        <span class="tick-item"><span class="tick-sym">IBOV</span><span class="tick-p" id="tk-IBOV">—</span></span>
+        <span class="tick-item"><span class="tick-sym">WINQ</span><span class="tick-p" id="tk-WINQ">—</span></span>
+        <span class="tick-item"><span class="tick-sym">EURUSD</span><span class="tick-p" id="tk-EURUSD">—</span></span>
+        <span class="tick-item"><span class="tick-sym">XAUUSD</span><span class="tick-p" id="tk-XAUUSD">—</span></span>
+        <span class="tick-item"><span class="tick-sym">US100</span><span class="tick-p" id="tk-US100">—</span></span>
+        <span class="tick-item"><span class="tick-sym">USDJPY</span><span class="tick-p" id="tk-USDJPY">—</span></span>
+        <!-- duplicate for infinite loop -->
+        <span class="tick-item"><span class="tick-sym">PETR4</span><span class="tick-p">—</span></span>
+        <span class="tick-item"><span class="tick-sym">VALE3</span><span class="tick-p">—</span></span>
+        <span class="tick-item"><span class="tick-sym">IBOV</span><span class="tick-p">—</span></span>
+        <span class="tick-item"><span class="tick-sym">WINQ</span><span class="tick-p">—</span></span>
+        <span class="tick-item"><span class="tick-sym">EURUSD</span><span class="tick-p">—</span></span>
+        <span class="tick-item"><span class="tick-sym">XAUUSD</span><span class="tick-p">—</span></span>
+        <span class="tick-item"><span class="tick-sym">US100</span><span class="tick-p">—</span></span>
+        <span class="tick-item"><span class="tick-sym">USDJPY</span><span class="tick-p">—</span></span>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- ① ANÁLISE -->
+      <div id="pg-analysis" class="page on">
+        <div class="analysis-layout">
+
+          <!-- Left: Upload + Form -->
+          <div>
+            <div class="card mb8">
+              <div class="scan-line"></div>
+              <div class="card-head">
+                <span class="card-title tl">◈ Análise Técnica</span>
+                <span class="badge badge-s" id="last-analysis-ts">Aguardando</span>
+              </div>
+              <div class="card-body">
+                <div class="tf-tabs">
+                  <button class="tf-tab" onclick="setTF('M1',this)">M1</button>
+                  <button class="tf-tab" onclick="setTF('M5',this)">M5</button>
+                  <button class="tf-tab" onclick="setTF('M15',this)">M15</button>
+                  <button class="tf-tab on" onclick="setTF('H1',this)">H1</button>
+                  <button class="tf-tab" onclick="setTF('H4',this)">H4</button>
+                  <button class="tf-tab" onclick="setTF('D1',this)">D1</button>
+                </div>
+                <div class="form-row" style="margin-bottom:8px">
+                  <div class="form-group">
+                    <label>Ativo</label>
+                    <input type="text" id="inp-asset" value="PETR4" placeholder="ex: PETR4">
+                  </div>
+                  <div class="form-group">
+                    <label>Timeframe</label>
+                    <select id="inp-tf">
+                      <option value="M1">M1</option>
+                      <option value="M5">M5</option>
+                      <option value="M15">M15</option>
+                      <option value="H1" selected>H1</option>
+                      <option value="H4">H4</option>
+                      <option value="D1">D1</option>
+                      <option value="W1">W1</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group" style="margin-bottom:10px">
+                  <label>Observações / Contexto</label>
+                  <textarea id="inp-notes" rows="2" placeholder="Suporte/resistência, setup, macro, contexto..."></textarea>
+                </div>
+                <button class="btn btn-tl" style="width:100%" onclick="runAnalysis()" id="btn-analyze">
+                  ▶ Analisar Setup
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Result -->
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div class="card">
+              <div class="card-head">
+                <span class="card-title tl">Resultado Oracle</span>
+                <span class="badge badge-s" id="analysis-id-badge">—</span>
+              </div>
+              <div class="confidence-ring-wrap">
+                <div class="cring">
+                  <svg width="110" height="110" viewBox="0 0 110 110">
+                    <circle class="cring-bg" cx="55" cy="55" r="46"/>
+                    <circle class="cring-fill" id="cring-fill" cx="55" cy="55" r="46"
+                      stroke="var(--tl)" stroke-dasharray="289" stroke-dashoffset="289"/>
+                  </svg>
+                  <div class="cring-label">
+                    <span class="cring-num" id="cring-num">—</span>
+                    <span class="cring-txt">Conf.</span>
+                  </div>
+                </div>
+                <div id="pill-wrap" style="margin-top:4px"></div>
+                <div style="margin-top:4px;text-align:center">
+                  <span class="badge badge-s" id="trend-badge" style="display:none"></span>
+                </div>
+              </div>
+              <div class="setup-grid" id="setup-grid-wrap" style="display:none;border-top:1px solid var(--border)">
+                <div><div class="setup-lbl">Suporte</div><div class="setup-val pos" id="setup-support">—</div></div>
+                <div><div class="setup-lbl">Resistência</div><div class="setup-val neg" id="setup-resistance">—</div></div>
+                <div><div class="setup-lbl">Tendência</div><div class="setup-val am" id="setup-trend">—</div></div>
+                <div><div class="setup-lbl">Força</div><div class="setup-val" id="setup-strength">—</div></div>
+              </div>
+            </div>
+            <div class="card" id="reasoning-card" style="display:none">
+              <div class="card-head"><span class="card-title">Raciocínio da IA</span></div>
+              <div id="reasoning-wrap" class="analysis-text"></div>
+              <div id="risks-wrap" class="reason-list"></div>
+              <div id="scenarios-wrap" class="scenarios-section" style="display:none">
+                <div class="scenario-bull" id="bull-wrap"></div>
+                <div class="scenario-bear" id="bear-wrap"></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ② CHAT -->
+      <div id="pg-chat" class="page">
+        <div class="chat-area" id="chat-area">
+          <div class="msg msg-jarvis">
+            <div class="msg-name">ORACLE</div>
+            <div class="msg-bubble jarvis-bubble">
+              Olá! Sou o Oracle Trader Assist. Posso analisar setups, responder dúvidas sobre mercado e ajudar no seu processo de decisão.<br><br>
+              Use <strong>@analisar PETR4</strong> ou simplesmente descreva o que precisa. Para análises com contexto visual, descreva o que vê no gráfico no campo de texto.
+            </div>
+            <div class="msg-meta" id="chat-init-ts"></div>
+          </div>
+        </div>
+        <div style="padding:10px 20px 0;border-top:1px solid var(--border);background:rgba(6,8,16,.8)">
+          <div class="quick-actions">
+            <button class="qa-btn" onclick="chatQuick('Analise o setup atual para PETR4')">▶ Analisar PETR4</button>
+            <button class="qa-btn" onclick="chatQuick('Como está o mercado hoje?')">📊 Mercado hoje</button>
+            <button class="qa-btn" onclick="chatQuick('Quais são os principais riscos no momento?')">⚠ Riscos</button>
+            <button class="qa-btn" onclick="chatQuick('Qual é o melhor setup para operar agora?')">🎯 Melhor setup</button>
+          </div>
+        </div>
+        <div class="chat-input-bar">
+          <textarea class="chat-input" id="chat-input" placeholder="Pergunte ao Oracle... (ex: analise EURUSD H1)" rows="1"></textarea>
+          <button class="btn btn-ghost" title="Anexar screenshot" onclick="el('inp-chat-file').click()">📎</button>
+          <input type="file" id="inp-chat-file" accept="image/*" style="display:none" onchange="onChatFileChange(this)">
+          <button class="btn btn-tl" onclick="sendChatMsg()" id="btn-send">→</button>
+        </div>
+      </div>
+
+      <!-- ③ TRADES -->
+      <div id="pg-trades" class="page">
+        <div class="stats-bar">
+          <div class="stat-card"><div class="stat-lbl">Total</div><div class="stat-val" id="st-total">—</div></div>
+          <div class="stat-card"><div class="stat-lbl">Abertos</div><div class="stat-val" style="color:var(--tl)" id="st-open">—</div></div>
+          <div class="stat-card"><div class="stat-lbl">Vitórias</div><div class="stat-val pos" id="st-wins">—</div></div>
+          <div class="stat-card"><div class="stat-lbl">Derrotas</div><div class="stat-val neg" id="st-losses">—</div></div>
+          <div class="stat-card"><div class="stat-lbl">Win Rate</div><div class="stat-val" id="st-wr">—</div></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <div class="filter-tabs">
+            <button class="ftab on" onclick="filterTrades('all',this)">Todos</button>
+            <button class="ftab" onclick="filterTrades('open',this)">Abertos</button>
+            <button class="ftab" onclick="filterTrades('closed',this)">Fechados</button>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-ghost" onclick="exportTrades()" style="font-size:12px">⬇ CSV</button>
+            <button class="btn btn-tl" onclick="showTradeModal()" style="font-size:12px">+ Novo Trade</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-body np">
+            <table class="trade-table">
+              <thead><tr>
+                <th>Ativo</th><th>Dir</th><th>TF</th><th>Setup</th>
+                <th>Entrada</th><th>Stop</th><th>Alvo</th>
+                <th>R</th><th>Status</th><th>Ações</th>
+              </tr></thead>
+              <tbody id="trades-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ④ MERCADO -->
+      <div id="pg-market" class="page">
+        <div class="mkt-grid">
+          <div class="mkt-card sel" id="mkt-PETR4" onclick="selectMktAsset('PETR4',this)">
+            <div class="mkt-sym">PETR4</div>
+            <div class="mkt-p" id="mkt-p-PETR4">—</div>
+            <div class="mkt-chg" id="mkt-chg-PETR4">—</div>
+          </div>
+          <div class="mkt-card" id="mkt-VALE3" onclick="selectMktAsset('VALE3',this)">
+            <div class="mkt-sym">VALE3</div>
+            <div class="mkt-p" id="mkt-p-VALE3">—</div>
+            <div class="mkt-chg" id="mkt-chg-VALE3">—</div>
+          </div>
+          <div class="mkt-card" id="mkt-IBOV" onclick="selectMktAsset('IBOV',this)">
+            <div class="mkt-sym">IBOV</div>
+            <div class="mkt-p" id="mkt-p-IBOV">—</div>
+            <div class="mkt-chg" id="mkt-chg-IBOV">—</div>
+          </div>
+          <div class="mkt-card" id="mkt-WINQ" onclick="selectMktAsset('WINQ',this)">
+            <div class="mkt-sym">WINQ</div>
+            <div class="mkt-p" id="mkt-p-WINQ">—</div>
+            <div class="mkt-chg" id="mkt-chg-WINQ">—</div>
+          </div>
+          <div class="mkt-card" id="mkt-EURUSD" onclick="selectMktAsset('EURUSD',this)">
+            <div class="mkt-sym">EUR/USD</div>
+            <div class="mkt-p" id="mkt-p-EURUSD">—</div>
+            <div class="mkt-chg" id="mkt-chg-EURUSD">—</div>
+          </div>
+          <div class="mkt-card" id="mkt-XAUUSD" onclick="selectMktAsset('XAUUSD',this)">
+            <div class="mkt-sym">XAU/USD</div>
+            <div class="mkt-p" id="mkt-p-XAUUSD">—</div>
+            <div class="mkt-chg" id="mkt-chg-XAUUSD">—</div>
+          </div>
+          <div class="mkt-card" id="mkt-US100" onclick="selectMktAsset('US100',this)">
+            <div class="mkt-sym">US100</div>
+            <div class="mkt-p" id="mkt-p-US100">—</div>
+            <div class="mkt-chg" id="mkt-chg-US100">—</div>
+          </div>
+          <div class="mkt-card" id="mkt-USDJPY" onclick="selectMktAsset('USDJPY',this)">
+            <div class="mkt-sym">USD/JPY</div>
+            <div class="mkt-p" id="mkt-p-USDJPY">—</div>
+            <div class="mkt-chg" id="mkt-chg-USDJPY">—</div>
+          </div>
+        </div>
+        <div class="g2">
+          <div class="card">
+            <div class="card-head">
+              <span class="card-title tl">Multi-Timeframe</span>
+              <span class="badge badge-s" id="mkt-selected-sym">PETR4</span>
+            </div>
+            <div class="tf-align-grid">
+              <div class="tfa"><div class="tfa-name">MN</div><div class="tfa-trend tfa-side">→ LATE</div></div>
+              <div class="tfa"><div class="tfa-name">W1</div><div class="tfa-trend tfa-side">→ LATE</div></div>
+              <div class="tfa"><div class="tfa-name">D1</div><div class="tfa-trend tfa-up">↑ BULL</div></div>
+              <div class="tfa"><div class="tfa-name">H4</div><div class="tfa-trend tfa-up">↑ BULL</div></div>
+              <div class="tfa"><div class="tfa-name">H1</div><div class="tfa-trend tfa-side">→ LATE</div></div>
+              <div class="tfa"><div class="tfa-name">M15</div><div class="tfa-trend tfa-up">↑ PBK</div></div>
+            </div>
+            <div style="padding:8px 14px 12px;font-size:11px;color:var(--t3)">Clique em um ativo acima para carregar alinhamento de timeframes.</div>
+          </div>
+          <div class="card">
+            <div class="card-head">
+              <span class="card-title am">Sessões de Mercado</span>
+              <span class="badge badge-s" id="sessions-status">—</span>
+            </div>
+            <div class="card-body" style="padding-top:8px">
+              <div class="session-bar">
+                <div class="session-seg sess-sydney">SYD</div>
+                <div class="session-seg sess-tokyo">TOK</div>
+                <div class="session-seg sess-london">LON</div>
+                <div class="session-seg sess-overlap">OVL</div>
+                <div class="session-seg sess-ny">NY</div>
+              </div>
+              <div style="display:flex;gap:12px;font-size:10px;font-family:var(--mono);color:var(--t3);padding:8px 0">
+                <span><span style="color:var(--tl)">●</span> London: 06:00–15:00 BRT</span>
+                <span><span style="color:var(--red)">●</span> NY: 10:00–19:00 BRT</span>
+              </div>
+            </div>
+            <div class="card-head" style="border-top:1px solid var(--border)"><span class="card-title">Calendário Macro</span></div>
+            <div id="macro-calendar">
+              <div class="watchlist-item">
+                <div class="wi-left">
+                  <div class="wi-sym" style="font-size:11px;color:var(--t3)">Nenhum evento agendado</div>
+                  <div class="wi-setup">Dados via Briefing Matinal</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ⑤ PERFORMANCE -->
+      <div id="pg-perf" class="page">
+        <div class="perf-top">
+          <div class="card">
+            <div class="card-head"><span class="card-title g">Win Rate</span></div>
+            <div class="wr-gauge">
+              <svg width="140" height="100" viewBox="0 0 140 100">
+                <path d="M 20 90 A 50 50 0 0 1 120 90" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="14" stroke-linecap="round"/>
+                <path id="gauge-arc" d="M 20 90 A 50 50 0 0 1 120 90" fill="none" stroke="var(--green)" stroke-width="14" stroke-linecap="round"
+                  stroke-dasharray="160" stroke-dashoffset="160"/>
+                <text id="gauge-num" x="70" y="78" text-anchor="middle" font-family="JetBrains Mono" font-size="22" font-weight="700" fill="#00C896">—</text>
+                <text id="gauge-sub" x="70" y="94" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="rgba(255,255,255,0.3)">0 TRADES</text>
+              </svg>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head">
+              <span class="card-title">Métricas — 30 dias</span>
+              <button class="btn btn-ghost" onclick="loadPerf()" style="padding:4px 10px;font-size:11px">↻</button>
+            </div>
+            <div class="metric-rows" id="perf-ev"></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><span class="card-title">Resumo Geral</span></div>
+            <div class="metric-rows" id="perf-summary"></div>
+          </div>
+        </div>
+        <div class="card mb8">
+          <div class="card-head"><span class="card-title">P&L por Período</span></div>
+          <div class="pnl-bars" id="perf-pnl">
+            <div style="padding:20px;color:var(--t4);font-size:11px;text-align:center">Carregando dados...</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head"><span class="card-title">Drawdown</span></div>
+          <div class="metric-rows" id="perf-dd"></div>
+        </div>
+      </div>
+
+      <!-- ⑥ BRIEFING -->
+      <div id="pg-briefing" class="page">
+        <div class="g2">
+          <div>
+            <div class="card mb8">
+              <div class="card-head">
+                <span class="card-title tl">◐ Briefing Matinal</span>
+                <button class="btn btn-ghost" onclick="loadBriefing()" style="padding:4px 10px;font-size:11px">↻ Atualizar</button>
+              </div>
+              <div id="briefing-text" class="briefing-text">
+                <div class="typing-anim"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>
+                &nbsp;Aguardando...
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="card mb8">
+              <div class="card-head"><span class="card-title am">Ativos em Observação</span></div>
+              <div id="briefing-assets"></div>
+            </div>
+            <div class="card">
+              <div class="card-head"><span class="card-title">Próximos Eventos</span></div>
+              <div id="briefing-events"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ⑦ CHECKLIST -->
+      <div id="pg-checklist" class="page">
+        <div class="checklist-layout">
+
+          <!-- Checklist -->
+          <div class="card">
+            <div class="card-head">
+              <span class="card-title tl">☑ Checklist Pré-Trade</span>
+              <span class="badge badge-am" id="chk-score-badge">Score: 0/14</span>
+            </div>
+            <div class="check-score-bar">
+              <div class="check-score-fill score-low" id="chk-bar" style="width:0%"></div>
+            </div>
+            <div class="score-label" id="chk-label">✗ BLOQUEADO — Complete mais itens</div>
+
+            <div class="check-group">
+              <div class="check-group-title">Contexto & Setup</div>
+              <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-text">Tendência HTF identificada e alinhada com o trade</div></div>
+              <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-text">Suporte/Resistência clara no ponto de entrada</div></div>
+              <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-text">Multi-timeframe: pelo menos 2 TFs alinhados</div></div>
+              <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-text">Setup tem nome e histórico (não é impulsivo)</div></div>
+            </div>
+
+            <div class="check-group">
+              <div class="check-group-title">Risco & Gestão</div>
+              <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-text">Stop Loss definido ANTES da entrada</div></div>
+              <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-text">R/R mínimo de 1:1.5 calculado</div></div>
+              <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-text">Tamanho de posição calculado (risco ≤ 1% conta)</div></div>
+              <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-text">Drawdown diário ainda não atingido (≤ -3R)</div></div>
+            </div>
+
+            <div class="check-group">
+              <div class="check-group-title">Anti-FOMO / Contexto Emocional</div>
+              <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-text">Não estou operando para recuperar loss anterior</div></div>
+              <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-text">Não há evento macro em menos de 30 minutos</div></div>
+              <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-text">Horário dentro da janela operacional ideal</div></div>
+              <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-text">Não é a 1ª candle de abertura de sessão</div></div>
+            </div>
+
+            <div class="check-group">
+              <div class="check-group-title">Confirmação Final</div>
+              <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-text">Confidence Score Oracle ≥ 65</div></div>
+              <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-text">Plano de saída definido (onde fechar parcial / total)</div></div>
+            </div>
+
+            <div style="padding:12px 14px;border-top:1px solid var(--border);display:flex;gap:8px">
+              <button class="btn btn-tl" style="flex:1" onclick="approveChecklist()">✓ Aprovar para Entrada</button>
+              <button class="btn btn-ghost" onclick="resetChecklist()">Resetar</button>
+            </div>
+          </div>
+
+          <!-- Right: Risk Calc + Anti-FOMO -->
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div class="card">
+              <div class="card-head"><span class="card-title am">Calculadora de Risco</span></div>
+              <div class="risk-inputs">
+                <div class="risk-field"><label>Banca (R$)</label><input type="number" value="10000" id="r-banca" oninput="calcRisk()"></div>
+                <div class="risk-field"><label>Risco % trade</label><input type="number" value="1" step="0.1" id="r-pct" oninput="calcRisk()"></div>
+                <div class="risk-field"><label>Entrada</label><input type="number" value="0" step="0.01" id="r-entry" oninput="calcRisk()"></div>
+                <div class="risk-field"><label>Stop Loss</label><input type="number" value="0" step="0.01" id="r-sl" oninput="calcRisk()"></div>
+                <div class="risk-field"><label>Take Profit</label><input type="number" value="0" step="0.01" id="r-tp" oninput="calcRisk()"></div>
+                <div class="risk-field"><label>Lote padrão</label><input type="number" value="100000" id="r-lot" oninput="calcRisk()"></div>
+              </div>
+              <div class="risk-result">
+                <div class="risk-row"><span class="risk-row-lbl">Risco em R$</span><span class="risk-row-val" id="r-val-risk" style="color:var(--red)">—</span></div>
+                <div class="risk-row"><span class="risk-row-lbl">Pips de risco</span><span class="risk-row-val" id="r-val-pips" style="color:var(--am)">—</span></div>
+                <div class="risk-row"><span class="risk-row-lbl">Tamanho de lote</span><span class="risk-row-val" id="r-val-lots" style="color:var(--tl)">—</span></div>
+                <div class="risk-row"><span class="risk-row-lbl">Potencial lucro</span><span class="risk-row-val" id="r-val-profit" style="color:var(--green)">—</span></div>
+                <div class="risk-row"><span class="risk-row-lbl">Risk/Reward</span><span class="risk-row-val" id="r-val-rr">—</span></div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-head">
+                <span class="card-title r">Anti-FOMO Filter</span>
+                <span class="badge badge-s" id="fomo-verdict">Aguardando</span>
+              </div>
+              <div>
+                <div class="fomo-item"><span class="fomo-label">Loss consecutivo hoje?</span><span class="fomo-status fs-ok" id="fomo-loss">OK</span></div>
+                <div class="fomo-item"><span class="fomo-label">Horário de risco?</span><span class="fomo-status fs-ok" id="fomo-hour">OK</span></div>
+                <div class="fomo-item"><span class="fomo-label">Macro nos próximos 30min?</span><span class="fomo-status fs-ok" id="fomo-macro">—</span></div>
+                <div class="fomo-item"><span class="fomo-label">Trades hoje?</span><span class="fomo-status fs-ok" id="fomo-count">—</span></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ⑧ REPLAY -->
+      <div id="pg-replay" class="page">
+        <div class="g2 mb8">
+          <div class="card">
+            <div class="scan-line"></div>
+            <div class="card-head">
+              <span class="card-title tl">⏵ Nova Sessão</span>
+              <span class="badge badge-s" id="replay-state-badge">Aguardando</span>
+            </div>
+            <div class="card-body">
+              <div class="form-row" style="margin-bottom:8px">
+                <div class="form-group"><label>Ativo</label><input type="text" id="rp-asset" value="PETR4"></div>
+                <div class="form-group">
+                  <label>Timeframe</label>
+                  <select id="rp-tf">
+                    <option value="M5">M5</option><option value="M15">M15</option>
+                    <option value="M30">M30</option><option value="H1" selected>H1</option>
+                    <option value="H4">H4</option><option value="D1">D1</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row" style="margin-bottom:10px">
+                <div class="form-group"><label>Início</label><input type="datetime-local" id="rp-start"></div>
+                <div class="form-group"><label>Fim</label><input type="datetime-local" id="rp-end"></div>
+              </div>
+              <button class="btn btn-tl" style="width:100%" onclick="createReplay()" id="btn-replay">▶ Criar Sessão</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head"><span class="card-title">Estado da Sessão</span></div>
+            <div class="metric-rows" id="replay-status">
+              <div style="padding:20px;color:var(--t4);font-size:11px;text-align:center">Nenhuma sessão ativa</div>
+            </div>
+          </div>
+        </div>
+        <div class="card" id="replay-frame-card" style="display:none">
+          <div class="card-head">
+            <span class="card-title">Candle Atual</span>
+            <span class="badge badge-s" id="replay-progress">—</span>
+          </div>
+          <div id="replay-chart" style="height:220px;border-bottom:1px solid var(--border)"></div>
+          <div class="card-body" id="replay-frame" style="padding-top:6px">
+            <div style="padding:14px;color:var(--t4);font-size:11px;text-align:center">Aguardando frame via WebSocket...</div>
+          </div>
+          <div class="replay-controls">
+            <button class="btn btn-tl" onclick="replayNext()" id="btn-rp-next">⏭ Avançar Frame</button>
+            <button class="btn btn-ghost" onclick="replayFinish()" id="btn-rp-finish">⏹ Finalizar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ⑨ CONFIG -->
+      <div id="pg-config" class="page">
+        <div class="g2">
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div class="card">
+              <div class="card-head"><span class="card-title">Chaves de API</span></div>
+              <div>
+                <div class="config-row">
+                  <div><div class="config-lbl">Anthropic API Key</div><div class="config-sub" id="cfg-claude-model">claude-sonnet-4-6</div></div>
+                  <div class="config-val config-masked">sk-ant-••••••</div>
+                </div>
+                <div class="config-row">
+                  <div><div class="config-lbl">MT5 Login</div><div class="config-sub">MetaTrader 5</div></div>
+                  <div class="config-val config-masked">••••••</div>
+                </div>
+                <div class="config-row">
+                  <div><div class="config-lbl">Ambiente</div><div class="config-sub">Modo atual</div></div>
+                  <div class="config-val" id="cfg-env">development</div>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-head"><span class="card-title">Confidence Engine</span></div>
+              <div>
+                <div class="config-row"><div class="config-lbl">Score mínimo para entrada</div><div class="config-val" style="color:var(--tl)">65</div></div>
+                <div class="config-row"><div class="config-lbl">Score alta convicção</div><div class="config-val" style="color:var(--green)">80</div></div>
+                <div class="config-row"><div class="config-lbl">Modelo padrão</div><div class="config-val" style="color:var(--tl)" id="cfg-model">claude-sonnet-4-6</div></div>
+                <div class="config-row"><div class="config-lbl">Max tokens</div><div class="config-val">8096</div></div>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div class="card">
+              <div class="card-head"><span class="card-title">Features</span></div>
+              <div>
+                <div class="config-row">
+                  <div><div class="config-lbl">Anti-FOMO Filter</div><div class="config-sub">Bloqueia trades em condições de risco</div></div>
+                  <div class="toggle on" data-key="feature_antifomo" onclick="toggleFeature(this)"></div>
+                </div>
+                <div class="config-row">
+                  <div><div class="config-lbl">Briefing automático</div><div class="config-sub">Carrega ao navegar para a página</div></div>
+                  <div class="toggle on" data-key="feature_autobriefing" onclick="toggleFeature(this)"></div>
+                </div>
+                <div class="config-row">
+                  <div><div class="config-lbl">Memória de contexto</div><div class="config-sub">Inclui histórico nas análises</div></div>
+                  <div class="toggle on" data-key="feature_memory" onclick="toggleFeature(this)"></div>
+                </div>
+                <div class="config-row">
+                  <div><div class="config-lbl">WS auto-reconect</div><div class="config-sub">Reconexão exponencial automática</div></div>
+                  <div class="toggle on" data-key="feature_wsreconnect" onclick="toggleFeature(this)"></div>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-head"><span class="card-title g">Status do Sistema</span></div>
+              <div>
+                <div class="config-row">
+                  <div class="config-lbl">Claude API</div>
+                  <div style="display:flex;align-items:center;gap:5px;font-family:var(--mono);font-size:10px">
+                    <span class="sys-dot" id="cfg-dot-api"></span><span id="cfg-status-api">—</span>
+                  </div>
+                </div>
+                <div class="config-row">
+                  <div class="config-lbl">WebSocket</div>
+                  <div style="display:flex;align-items:center;gap:5px;font-family:var(--mono);font-size:10px">
+                    <span class="sys-dot" id="cfg-dot-ws"></span><span id="cfg-status-ws">—</span>
+                  </div>
+                </div>
+                <div class="config-row">
+                  <div class="config-lbl">Database</div>
+                  <div style="display:flex;align-items:center;gap:5px;font-family:var(--mono);font-size:10px">
+                    <span class="sys-dot" id="cfg-dot-db"></span><span id="cfg-status-db">—</span>
+                  </div>
+                </div>
+                <div class="config-row">
+                  <div class="config-lbl">Fase atual</div>
+                  <div class="badge badge-tl" style="font-size:9px">FASE 1 — MVP</div>
+                </div>
+              </div>
+              <div style="padding:10px 14px;border-top:1px solid var(--border)">
+                <button class="btn btn-ghost" style="font-size:11px;width:100%" onclick="checkHealth()">🔄 Testar conexões</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- .content -->
+  </main>
+</div><!-- .shell -->
+
+<!-- Modal: Novo Trade -->
+<div id="trade-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)hideTradeModal()">
+  <div class="modal">
+    <div class="modal-head">
+      <span class="card-title tl">◉ Registrar Trade</span>
+      <button class="btn btn-ghost" onclick="hideTradeModal()" style="padding:3px 8px;font-size:11px">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="trade-form-error" style="display:none;color:var(--red);font-size:11px;padding:6px 10px;background:var(--red-lo);border:1px solid rgba(255,69,96,.2);border-radius:6px;margin-bottom:4px"></div>
+      <div class="form-row">
+        <div class="form-group"><label>Ativo</label><input type="text" id="tm-asset" placeholder="PETR4"></div>
+        <div class="form-group">
+          <label>Direção</label>
+          <select id="tm-dir">
+            <option value="long">LONG ▲</option>
+            <option value="short">SHORT ▼</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Timeframe</label>
+          <select id="tm-tf">
+            <option value="M5">M5</option><option value="M15">M15</option>
+            <option value="M30">M30</option><option value="H1" selected>H1</option>
+            <option value="H4">H4</option><option value="D1">D1</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Estado Emocional</label>
+          <select id="tm-emo">
+            <option value="calmo">Calmo</option>
+            <option value="ansioso">Ansioso</option><option value="confiante">Confiante</option>
+            <option value="fomo">FOMO ⚠</option>
+            <option value="revanche">Revanche ⚠</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Entrada</label><input type="number" id="tm-entry" step="0.01" placeholder="0.00"></div>
+        <div class="form-group"><label>Stop</label><input type="number" id="tm-stop" step="0.01" placeholder="0.00"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Alvo</label><input type="number" id="tm-target" step="0.01" placeholder="0.00"></div>
+        <div class="form-group"><label>Setup</label><input type="text" id="tm-setup" placeholder="ex: EMA+Rompimento"></div>
+      </div>
+      <div class="form-group"><label>Observações</label><textarea id="tm-notes" rows="2" placeholder="Contexto adicional..."></textarea></div>
+      <button class="btn btn-tl" style="width:100%;margin-top:4px" onclick="submitTrade()" id="btn-submit-trade">◉ Registrar Trade</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Fechar Trade -->
+<div id="close-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)hideCloseModal()">
+  <div class="modal">
+    <div class="modal-head">
+      <span class="card-title am">Fechar Trade</span>
+      <button class="btn btn-ghost" onclick="hideCloseModal()" style="padding:3px 8px;font-size:11px">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="cm-trade-id">
+      <div class="form-row">
+        <div class="form-group"><label>Preço de Saída</label><input type="number" id="cm-exit" step="0.01" placeholder="0.00"></div>
+        <div class="form-group">
+          <label>Resultado</label>
+          <select id="cm-result">
+            <option value="win">Win ✓</option>
+            <option value="loss">Loss ✗</option>
+            <option value="breakeven">Breakeven ◌</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group"><label>Observações</label><textarea id="cm-notes" rows="2" placeholder="O que aconteceu?"></textarea></div>
+      <button class="btn btn-tl" style="width:100%;margin-top:4px;background:linear-gradient(135deg,var(--am),#c07800);color:#000" onclick="submitClose()" id="btn-submit-close">
+        Confirmar Fechamento
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Reflexão IA -->
+<div id="reflect-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)hideReflectModal()">
+  <div class="modal" style="max-width:520px">
+    <div class="modal-head">
+      <span class="card-title tl">◈ Reflexão Oracle</span>
+      <button class="btn btn-ghost" onclick="hideReflectModal()" style="padding:3px 8px;font-size:11px">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="reflect-trade-id">
+      <div id="reflect-loading" style="padding:20px;text-align:center">
+        <div class="typing-anim"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>
+        <div style="margin-top:8px;font-size:11px;color:var(--t3)">Analisando trade com IA...</div>
+      </div>
+      <pre id="reflect-content" style="display:none;white-space:pre-wrap;font-family:var(--sans);font-size:12px;line-height:1.7;color:var(--t2);max-height:380px;overflow-y:auto;padding:4px 0"></pre>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
