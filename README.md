@@ -30,6 +30,14 @@ It is **not** a trade execution bot. It is a decision-support system — it help
 
 > **Frontend preview:** `http://localhost:8000` after `make up && make migrate && uvicorn oracle.main:app --reload`
 
+### Interface
+
+<sub>Vector mockups of the SPA, rendered to match the shipped layout.</sub>
+
+![Dashboard](docs/assets/dashboard.svg)
+
+![Replay engine](docs/assets/replay.svg)
+
 ---
 
 ## Features
@@ -76,6 +84,8 @@ It is **not** a trade execution bot. It is a decision-support system — it help
 
 ## Architecture
 
+![Clean Architecture](docs/assets/clean-architecture.svg)
+
 ### Clean Architecture (strict one-way dependencies)
 
 ```
@@ -119,6 +129,10 @@ Domain has zero imports from FastAPI, SQLAlchemy, or Redis.
 │  └─────────────────┘  └─────────────────┘  └──────────────────────┘ │
 └──────────────────────────────────────────────────────────────────────┘
 ```
+
+### System Overview
+
+![System Overview](docs/assets/system-overview.svg)
 
 ### Event Flow
 
