@@ -14,7 +14,8 @@ __pycache__/
 *.egg-info/
 dist/
 build/
-docs/
+docs/*
+!docs/assets/
 
 # ── Virtual Environments ──────────────────────────────────────────────────────
 venv/
